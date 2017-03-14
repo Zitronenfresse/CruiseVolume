@@ -55,43 +55,41 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/textSpeedThrOne"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.5"
                         android:text="TextView" />
 
                     <SeekBar
                         android:id="@+id/seekSpeedThrOne"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" />
+                        android:layout_weight="0.5" />
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/textVolThrOne"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.5"
                         android:text="TextView" />
 
                     <SeekBar
                         android:id="@+id/seekVolThrOne"
                         style="@style/Widget.AppCompat.SeekBar.Discrete"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.5"
                         android:max="15"
                         android:progress="3" />
                 </LinearLayout>
@@ -110,21 +108,20 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/textSpeedThrTwo"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.5"
                         android:text="TextView" />
 
                     <SeekBar
                         android:id="@+id/seekSpeedThrTwo"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" />
+                        android:layout_weight="0.5" />
 
                 </LinearLayout>
 
@@ -135,17 +132,17 @@
 
                     <TextView
                         android:id="@+id/textVolThrTwo"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.5"
                         android:text="TextView" />
 
                     <SeekBar
                         android:id="@+id/seekVolThrTwo"
                         style="@style/Widget.AppCompat.SeekBar.Discrete"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.5"
                         android:max="15"
                         android:progress="3" />
 
@@ -210,6 +207,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:onClick="onLauncherServiceButtonPressed"
                 android:text="@string/launchButtonText" />
 
             <Button
@@ -219,6 +217,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
+                android:onClick="onApplyServiceButtonPressed"
                 android:text="Apply"
                 app:layout_constraintLeft_toRightOf="@+id/launchButton"
                 tools:layout_editor_absoluteY="455dp" />
@@ -230,6 +229,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
+                android:onClick="onSuspendServiceButtonPressed"
                 android:text="Suspend"
                 app:layout_constraintLeft_toRightOf="@+id/applyButton"
                 tools:layout_editor_absoluteY="455dp" />

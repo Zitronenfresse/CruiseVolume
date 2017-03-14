@@ -89,6 +89,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         //speedBarOne.setProgress(mSpeedSetOne);
         speedBarTwo.setProgress(100);
 
+
     }
 
     private boolean checkPlayServices() {
@@ -153,16 +154,19 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
     public void onLauncherServiceButtonPressed(View view){
         if(mBound){
-
-            if(mCruiseService.updatingLocation){
-                mCruiseService.stopLocationUpdates();
-
-            }else{
-                mCruiseService.startLocationUpdates();
-
-            }
+            mCruiseService.startLocationUpdates();
         }
 
+    }
+
+    public void onSuspendServiceButtonPressed(View view){
+        if(mBound){
+            mCruiseService.stopLocationUpdates();
+        }
+    }
+
+    public void onApplyServiceButtonPressed(View view){
+        commitValues();
     }
 
     @Override
@@ -188,7 +192,8 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         if(mBound){
             mCruiseService.mBoundaryOne = mSpeedSetOne;
             mCruiseService.mBoundaryTwo = mSpeedSetTwo;
-
+            mCruiseService.mVolSetOne = mVolSetOne;
+            mCruiseService.mVolSetTwo = mVolSetTwo;
             return true;
         }else{
             return false;
@@ -219,10 +224,18 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
                 mSpeedSetTwo = progress;
                 break;
             case    R.id.seekVolThrOne :
-                mVolSetOne = progress;
+                if(progress<mVolSetTwo){
+                    mVolSetOne = progress;
+                }else{
+                    seekBar.setProgress(mVolSetTwo - 1);
+                }
                 break;
             case    R.id.seekVolThrTwo :
-                mVolSetTwo = progress;
+                if(progress>mVolSetOne){
+                    mVolSetTwo = progress;
+                }else{
+                    seekBar.setProgress(mVolSetOne + 1);
+                }
                 break;
         }
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
