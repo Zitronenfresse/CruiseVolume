@@ -29,29 +29,25 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     private double mSpeed;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
-    private double mBoundaryOne = 50;
-    private double mBoundaryTwo = 100;
+    protected int mBoundaryOne;
+    protected int mBoundaryTwo;
+    protected int mVolSetOne;
+    protected int mVolSetTwo;
     private int mInitialVolume = -1;
     NotificationManager mNotificationManager;
+    protected boolean updatingLocation = false;
 
     @Override
     public void onCreate(){
         super.onCreate();
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         createLocationRequest();
         createGoogleAPIClient();
         mGoogleApiClient.connect();
-        //showNotification();
-    }
-
-    public double getLastSpeed(){
-        return mSpeed;
     }
 
     private void showNotification(){
 
-
-
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
@@ -107,13 +103,17 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,CruiseService.this);
         Log.d("MY", "Starting Location updates");
+        updatingLocation = true;
+        showNotification();
+
 
     }
 
     protected void stopLocationUpdates(){
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) this);
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        updatingLocation = false;
+        cancelNotifications();
     }
-
 
     @Override
     public void onLocationChanged(Location location) {
@@ -148,7 +148,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.d("MY", "Connected to API");
-        startLocationUpdates();
 
 
     }
@@ -174,6 +173,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
     public class myBinder extends Binder {
+        //TODO: Use Binder as Interface
+
         CruiseService getService(){
             return CruiseService.this;
         }

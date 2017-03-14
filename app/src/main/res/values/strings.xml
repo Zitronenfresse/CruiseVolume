@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CruiseVolume</string>
+    <string name="launchButtonText">LAUNCH</string>
 </resources>

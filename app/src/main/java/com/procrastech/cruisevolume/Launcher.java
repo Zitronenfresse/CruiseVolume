@@ -11,23 +11,83 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-public class Launcher extends AppCompatActivity {
+public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
 
     private final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 2;
     boolean mBound = false;
     CruiseService mCruiseService;
+    SeekBar speedBarOne;
+    SeekBar speedBarTwo;
+    TextView speedTextOne;
+    TextView speedTextTwo;
+    SeekBar volBarOne;
+    SeekBar volBarTwo;
+    TextView volTextOne;
+    TextView volTextTwo;
+    protected int mSpeedSetOne;
+    protected int mSpeedSetTwo;
+    protected int mSpeedSetTwoTotal;
+    protected int mVolSetOne;
+    protected int mVolSetTwo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
+
         checkForPermissions();
         checkPlayServices();
+
+        initializePreferences();
+        initializeCruiseService();
+        initializeUI();
+
+    }
+
+    private void initializePreferences() {
+        //TODO: Import from local file
+        mSpeedSetOne = 50;
+        mSpeedSetTwo = 100;
+        mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
+        mVolSetOne = 5;
+        mVolSetTwo = 10;
+    }
+
+    private void initializeCruiseService() {
+        if(!mBound) {
+            Intent intent = new Intent(this, CruiseService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
+    private void initializeUI() {
+        speedBarOne = (SeekBar) findViewById(R.id.seekSpeedThrOne);
+        speedTextOne = (TextView) findViewById(R.id.textSpeedThrOne);
+        volBarOne = (SeekBar) findViewById(R.id.seekVolThrOne);
+        volTextOne = (TextView) findViewById(R.id.textVolThrOne);
+        speedBarTwo = (SeekBar) findViewById(R.id.seekSpeedThrTwo);
+        speedTextTwo = (TextView) findViewById(R.id.textSpeedThrTwo);
+        volBarTwo = (SeekBar) findViewById(R.id.seekVolThrTwo);
+        volTextTwo = (TextView) findViewById(R.id.textVolThrTwo);
+
+        speedBarOne.setOnSeekBarChangeListener(this);
+        speedBarTwo.setOnSeekBarChangeListener(this);
+        volBarOne.setOnSeekBarChangeListener(this);
+        volBarTwo.setOnSeekBarChangeListener(this);
+
+        speedBarOne.setMax(100);
+        speedBarTwo.setMax(200);
+
+        //speedBarOne.setProgress(mSpeedSetOne);
+        speedBarTwo.setProgress(100);
 
     }
 
@@ -92,20 +152,91 @@ public class Launcher extends AppCompatActivity {
     };
 
     public void onLauncherServiceButtonPressed(View view){
-        if(!mBound){
-            Intent intent = new Intent(this,CruiseService.class);
-            bindService(intent,mConnection, Context.BIND_AUTO_CREATE);
+        if(mBound){
 
-        }else{
+            if(mCruiseService.updatingLocation){
+                mCruiseService.stopLocationUpdates();
 
+            }else{
+                mCruiseService.startLocationUpdates();
+
+            }
         }
+
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState){
 
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
-        if(mBound)
-            mCruiseService.cancelNotifications();
+        if(mBound){
+            unbindService(mConnection);
+        }
+    }
+
+    public boolean commitValues(){
+        if(mBound){
+            mCruiseService.mBoundaryOne = mSpeedSetOne;
+            mCruiseService.mBoundaryTwo = mSpeedSetTwo;
+
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public void updateUI(){
+
+
+        speedTextOne.setText(mSpeedSetOne +" km/h");
+        speedTextTwo.setText(mSpeedSetTwoTotal +" km/h");
+        speedBarOne.setProgress(mSpeedSetOne);
+        speedBarTwo.setProgress(mSpeedSetTwo);
+        volTextOne.setText(mVolSetOne+"");
+        volTextTwo.setText(mVolSetTwo+"");
+        volBarOne.setProgress(mVolSetOne);
+        volBarTwo.setProgress(mVolSetTwo);
+
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        switch(seekBar.getId()){
+            case    R.id.seekSpeedThrOne :
+                mSpeedSetOne = progress;
+                break;
+            case    R.id.seekSpeedThrTwo :
+                mSpeedSetTwo = progress;
+                break;
+            case    R.id.seekVolThrOne :
+                mVolSetOne = progress;
+                break;
+            case    R.id.seekVolThrTwo :
+                mVolSetTwo = progress;
+                break;
+        }
+        mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
+        updateUI();
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 }
