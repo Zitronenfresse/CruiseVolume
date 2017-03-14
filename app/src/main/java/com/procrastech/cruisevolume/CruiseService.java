@@ -29,13 +29,28 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     private double mSpeed;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
-    protected int mBoundaryOne;
-    protected int mBoundaryTwo;
-    protected int mVolSetOne;
-    protected int mVolSetTwo;
-    private int mInitialVolume = -1;
+    protected int startSpeed;
+    protected int endSpeed;
+    protected int startVol;
+    protected int endVol;
     NotificationManager mNotificationManager;
     protected boolean updatingLocation = false;
+    protected int[] boundarr;
+    protected int[] volarr;
+
+    protected void createBoundaries(){
+        int number = endVol - startVol;
+        boundarr = new int[number+1];
+        volarr = new int[number+1];
+        double speedIntervall = (endSpeed - startSpeed)/(number);
+
+        for(int i = 0; i < number+1; i++){
+            volarr[i]=startVol+i;
+            boundarr[i]=(int) (startSpeed+(speedIntervall*i));
+            Log.d("MY","speedarr :" + boundarr[i]);
+        }
+
+    }
 
     @Override
     public void onCreate(){
@@ -67,14 +82,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public IBinder onBind(Intent intent) {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         return mBinder;
-    }
-
-    public void lowerVolume(){
-        mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_LOWER,0);
-    }
-
-    public void raiseVolume(){
-        mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,AudioManager.ADJUST_RAISE,0);
     }
 
     private void createLocationRequest() {
@@ -122,18 +129,16 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
     public void volumeControl(int speed){
-        if( speed >= mBoundaryOne){
-            if(mInitialVolume == -1 ){
-                mInitialVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            }
-            raiseVolume();
-        }else{
-            if(mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC) > mInitialVolume && mInitialVolume != -1){
-                lowerVolume();
-            }else{
-                mInitialVolume = -1;
+        if(boundarr!=null&&volarr!=null){
+            for(int i = 0; i < boundarr.length;i++){
+                if(speed > boundarr[i]){
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,volarr[i],0);
+                    break;
+                }
             }
         }
+
+
 
     }
 
@@ -166,6 +171,11 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public boolean onUnbind(Intent i){
         mNotificationManager.cancelAll();
         return false;
+    }
+
+    @Override
+    public void onRebind(Intent i){
+        super.onRebind(i);
     }
 
     public void cancelNotifications(){

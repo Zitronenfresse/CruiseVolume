@@ -50,7 +50,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="First Checkpoint" />
+                    android:text="Geschwindigkeit und Lautstaerkepegel - Beginn" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -96,14 +96,15 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="50dp" />
+                    android:layout_height="50dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/textView7"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Final Checkpoint" />
+                    android:text="Geschwindigkeit und Lautstaerkepegel - Ende" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -148,40 +149,44 @@
 
                 </LinearLayout>
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" />
+
                 <Switch
                     android:id="@+id/switch2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Switch" />
+                    android:text="Noch nicht implementiert" />
 
                 <Switch
                     android:id="@+id/switch9"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Switch" />
+                    android:text="Noch nicht implementiert" />
 
                 <Switch
                     android:id="@+id/switch8"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Switch" />
+                    android:text="Noch nicht implementiert" />
 
                 <Switch
                     android:id="@+id/switch7"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Switch" />
+                    android:text="Noch nicht implementiert" />
 
                 <TextView
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="TextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextView"
+                    android:text="BeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibung"
                     tools:layout_editor_absoluteX="8dp"
                     tools:layout_editor_absoluteY="0dp" />
 

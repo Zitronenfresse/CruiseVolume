@@ -29,7 +29,6 @@
             android:name=".CruiseService"
             android:enabled="true"
             android:exported="true"
-            android:launchMode="singleTask"
             ></service>
     </application>
 

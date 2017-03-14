@@ -36,6 +36,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     protected int mSpeedSetTwoTotal;
     protected int mVolSetOne;
     protected int mVolSetTwo;
+    CruiseService.myBinder mBinder;
 
 
     @Override
@@ -43,12 +44,14 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
+
         checkForPermissions();
         checkPlayServices();
 
         initializePreferences();
         initializeCruiseService();
         initializeUI();
+
 
     }
 
@@ -139,9 +142,10 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            CruiseService.myBinder mBinder = (CruiseService.myBinder) service;
+            mBinder = (CruiseService.myBinder) service;
             mCruiseService = mBinder.getService();
             mBound = true;
+
             Log.d("MY","Connection established");
         }
 
@@ -149,6 +153,8 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         public void onServiceDisconnected(ComponentName name) {
             mCruiseService = null;
             mBound = false;
+            Log.d("MY","Connection lost");
+
         }
     };
 
@@ -176,24 +182,17 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle savedInstanceState){
-
-    }
-
-    @Override
     public void onDestroy(){
         super.onDestroy();
-        if(mBound){
-            unbindService(mConnection);
-        }
     }
 
     public boolean commitValues(){
         if(mBound){
-            mCruiseService.mBoundaryOne = mSpeedSetOne;
-            mCruiseService.mBoundaryTwo = mSpeedSetTwo;
-            mCruiseService.mVolSetOne = mVolSetOne;
-            mCruiseService.mVolSetTwo = mVolSetTwo;
+            mCruiseService.startSpeed = mSpeedSetOne;
+            mCruiseService.endSpeed = mSpeedSetTwoTotal;
+            mCruiseService.startVol = mVolSetOne;
+            mCruiseService.endVol = mVolSetTwo;
+            mCruiseService.createBoundaries();
             return true;
         }else{
             return false;
@@ -251,5 +250,26 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBinder("CruiseServiceBinder",mBinder);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Always call the superclass so it can restore the view hierarchy
+        super.onRestoreInstanceState(savedInstanceState);
+
+        mBinder = (CruiseService.myBinder) savedInstanceState.getBinder("CruiseServiceBinder");
+        mCruiseService = mBinder.getService();
+        Intent intent = new Intent(this, CruiseService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+        if(mCruiseService!=null){
+            mBound = true;
+        }
+        // Restore state members from saved instance
     }
 }
