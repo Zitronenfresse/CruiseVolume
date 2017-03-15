@@ -171,7 +171,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
                 }
 
             }else{
-                if(initVol == -1){
+                if(initVol == -1&&curVol<=volarr[0]){
                     initVol = curVol;
                     Log.d("CONTROL", "VOL CONTROL set Initial Volume to "+initVol+".");
                 }
@@ -180,7 +180,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
                         continue;
                     }
                     setVolume(volarr[i]);
-                    Log.d("CONTROL", "VOL CONTROL set Volume to "+ volarr[i]+" at " +speed+"km/h");
+                    Log.d("CONTROL", "VOL CONTROL set Goal Volume to "+ volarr[i]+" at " +speed+"km/h");
                     break;
                 }
             }
@@ -208,6 +208,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         if(slowGainMode){
             incrementVol();
         }
+        Log.d("CONTROL", "VOL CONTROL set Current Volume to "+ curVol);
+
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,curVol,0);
     }
 

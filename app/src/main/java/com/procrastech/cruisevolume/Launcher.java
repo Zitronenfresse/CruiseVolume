@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
@@ -42,28 +43,63 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     protected boolean mSlowGainMode;
     CruiseService.myBinder mBinder;
 
+    public static final String PREFS_NAME = "CruisePrefsFile";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
+        restorePreferences();
+
         checkForPermissions();
         checkPlayServices();
 
-        initializePreferences();
         initializeCruiseService();
         initializeUI();
 
+
     }
 
-    private void initializePreferences() {
-        //TODO: Import from local file
-        mSpeedSetOne = 50;
-        mSpeedSetTwo = 100;
+    @Override
+    protected void onPause(){
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        savePreferences();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+    }
+
+    private void restorePreferences() {
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        mSlowGainMode = settings.getBoolean("slowGainMode", true);
+        mVolSetOne = settings.getInt("volSetOne",5);
+        mVolSetTwo = settings.getInt("volSetTwo",10);
+        mSpeedSetOne = settings.getInt("speedSetOne",50);
+        mSpeedSetTwo = settings.getInt("speedSetTwo", 100);
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
-        mVolSetOne = 5;
-        mVolSetTwo = 10;
+
+
+    }
+
+    private void savePreferences() {
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("slowGainMode", mSlowGainMode);
+        editor.putInt("volSetOne", mVolSetOne);
+        editor.putInt("volSetTwo", mVolSetTwo);
+        editor.putInt("speedSetOne", mSpeedSetOne);
+        editor.putInt("speedSetTwo", mSpeedSetTwo);
+
+        editor.commit();
     }
 
     private void initializeCruiseService() {
@@ -88,7 +124,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         volBarOne.setOnSeekBarChangeListener(this);
         volBarTwo.setOnSeekBarChangeListener(this);
         slowGainModeSwitch.setOnCheckedChangeListener(this);
-
+        slowGainModeSwitch.setChecked(mSlowGainMode);
         speedBarOne.setMax(100);
         speedBarTwo.setMax(200);
 
@@ -163,10 +199,11 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
     public void onLauncherServiceButtonPressed(View view){
         if(mBound){
-            mCruiseService.startLocationUpdates();
             if(mCruiseService.volarr==null||mCruiseService.boundarr==null){
                 commitValues();
             }
+            mCruiseService.startLocationUpdates();
+
         }
 
     }
@@ -181,16 +218,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         commitValues();
     }
 
-    @Override
-    public void onPause(){
-        super.onPause();
 
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-    }
 
     public boolean commitValues(){
         if(mBound){
