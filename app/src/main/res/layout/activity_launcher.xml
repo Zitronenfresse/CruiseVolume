@@ -50,7 +50,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Geschwindigkeit und Lautstaerkepegel - Beginn" />
+                    android:text="@string/onset_speed_and_volume_level" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -61,8 +61,7 @@
                         android:id="@+id/textSpeedThrOne"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:text="TextView" />
+                        android:layout_weight="0.5" />
 
                     <SeekBar
                         android:id="@+id/seekSpeedThrOne"
@@ -81,8 +80,7 @@
                         android:id="@+id/textVolThrOne"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:text="TextView" />
+                        android:layout_weight="0.5" />
 
                     <SeekBar
                         android:id="@+id/seekVolThrOne"
@@ -104,7 +102,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Geschwindigkeit und Lautstaerkepegel - Ende" />
+                    android:text="@string/final_speed_and_volume_level" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -115,8 +113,7 @@
                         android:id="@+id/textSpeedThrTwo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:text="TextView" />
+                        android:layout_weight="0.5" />
 
                     <SeekBar
                         android:id="@+id/seekSpeedThrTwo"
@@ -135,8 +132,7 @@
                         android:id="@+id/textVolThrTwo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:text="TextView" />
+                        android:layout_weight="0.5" />
 
                     <SeekBar
                         android:id="@+id/seekVolThrTwo"
@@ -158,14 +154,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Incremental Volume-adjustments" />
+                    android:text="@string/incAdjSwitchText" />
 
                 <TextView
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="BeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibungBeschreibung"
+                    android:text="@string/disclaimerText"
                     tools:layout_editor_absoluteX="8dp"
                     tools:layout_editor_absoluteY="0dp" />
 
@@ -175,7 +171,8 @@
         <Switch
             android:id="@+id/switchService"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
             android:text="Regulate Volume"
             android:textOff="Not Regulating Volume"
             android:textOn="Regulating Volume" />

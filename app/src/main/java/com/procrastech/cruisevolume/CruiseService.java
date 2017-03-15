@@ -92,9 +92,9 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
-        mBuilder.setContentTitle("Cruise Control");
-        mBuilder.setContentText("Cruise Control is running");
-        mBuilder.setSmallIcon(R.drawable.common_google_signin_btn_icon_dark);
+        mBuilder.setContentTitle("CruiseVolume");
+        mBuilder.setContentText("CruiseVolume is running");
+        mBuilder.setSmallIcon(R.drawable.noticon);
         mBuilder.setOngoing(true);
         Intent targetIntent = new Intent(this, Launcher.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);

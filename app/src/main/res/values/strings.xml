@@ -2,4 +2,7 @@
     <string name="app_name">CruiseVolume</string>
     <string name="launchButtonText">LAUNCH</string>
     <string name="disclaimerText">Disclaimer: This App intends to regulate your music-volume for you based on speed, acceleration and backgroundnoise. Use at your own risk. Use your brain.</string>
+    <string name="incAdjSwitchText">Incremental Volume-adjustments</string>
+    <string name="final_speed_and_volume_level">Final Speed and Volume Level</string>
+    <string name="onset_speed_and_volume_level">Onset Speed and Volume Level</string>
 </resources>
