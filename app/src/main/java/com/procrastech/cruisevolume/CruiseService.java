@@ -33,21 +33,44 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     protected int endSpeed;
     protected int startVol;
     protected int endVol;
+    protected int goalVol;
+    protected int curVol;
+    protected int initVol = -1;
     NotificationManager mNotificationManager;
     protected boolean updatingLocation = false;
     protected int[] boundarr;
     protected int[] volarr;
+    protected boolean slowGainMode = true;
+
+
+    //TODO: Add expansive logs (Done:VolumeControl)
+    //TODO: Adjustable LocUpdate-frequency
+    //TODO: API Level 3.0 Support
+    //TODO: Pause-mode when Location is not changing
+    //TODO: Awareness API integration
+    //TODO: Acceleration-sensor input to trigger single Location-requests
+    //TODO: Disclaimer
+    //TODO: Local Preference Saves
+    //TODO: Initial Wizard
+    //TODO: Handle Exceptions and Weak Signal
+    //TODO: Create App Logo/Icon and revise working title
+    //TODO: Analyse memory- and data-usage
+    //TODO: performance tests
+    //TODO: Option for User Volume Input to disable VolControl
 
     protected void createBoundaries(){
         int number = endVol - startVol;
         boundarr = new int[number+1];
         volarr = new int[number+1];
-        double speedIntervall = (endSpeed - startSpeed)/(number);
+        double speedInterval = (endSpeed - startSpeed)/(number);
+        Log.d("CONTROL","Creating Speed/Vol Arrays");
 
         for(int i = 0; i < number+1; i++){
             volarr[i]=startVol+i;
-            boundarr[i]=(int) (startSpeed+(speedIntervall*i));
-            Log.d("MY","speedarr :" + boundarr[i]);
+            boundarr[i]=(int) (startSpeed+(speedInterval*i));
+
+            Log.d("CONTROL","Volume level "+(i+startVol)+" at Speed " + boundarr[i]);
+
         }
 
     }
@@ -75,6 +98,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         mBuilder.setContentIntent(contentIntent);
 
         mNotificationManager.notify(11, mBuilder.build());
+        Log.d("NOTIFICATIONS", "Building Notification");
+
     }
 
     @Nullable
@@ -109,9 +134,12 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,CruiseService.this);
-        Log.d("MY", "Starting Location updates");
+        Log.d("LOCATION", "Starting Location updates");
         updatingLocation = true;
         showNotification();
+        if(boundarr==null||volarr==null){
+            createBoundaries();
+        }
 
 
     }
@@ -120,6 +148,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         updatingLocation = false;
         cancelNotifications();
+        Log.d("LOCATION", "Stopping Location updates");
+
     }
 
     @Override
@@ -130,23 +160,72 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     public void volumeControl(int speed){
         if(boundarr!=null&&volarr!=null){
-            for(int i = 0; i < boundarr.length;i++){
-                if(speed > boundarr[i]){
-                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,volarr[i],0);
+            Log.d("CONTROL", "VOL CONTROL Cycle with speed "+speed+" :");
+            curVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+            if(speed<boundarr[0]){
+                if(initVol!=-1){
+                    Log.d("CONTROL", "VOL CONTROL set Volume back to Initial Volume at "+initVol+".");
+                    setVolume(initVol);
+                    initVol = -1;
+                }
+
+            }else{
+                if(initVol == -1){
+                    initVol = curVol;
+                    Log.d("CONTROL", "VOL CONTROL set Initial Volume to "+initVol+".");
+                }
+                for(int i = boundarr.length-1; i >= 0;i--){
+                    if(speed < boundarr[i]){
+                        continue;
+                    }
+                    setVolume(volarr[i]);
+                    Log.d("CONTROL", "VOL CONTROL set Volume to "+ volarr[i]+" at " +speed+"km/h");
                     break;
                 }
             }
+
+            //TODO: Move updateVolume to own handler with adjustable update-frequency
+            updateVolume();
         }
+    }
 
+    protected void setSlowGainMode(boolean x){
+        slowGainMode = x;
+    }
 
+    private void incrementVol() {
+        if(curVol<goalVol){
+            curVol++;
+        }else{
+            if(curVol>goalVol){
+                curVol--;
+            }
+        }
+    }
+
+    private void updateVolume() {
+        if(slowGainMode){
+            incrementVol();
+        }
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,curVol,0);
+    }
+
+    public void setVolume(int vol){
+        if (slowGainMode) {
+            goalVol = vol;
+        }else{
+            curVol = vol;
+        }
 
     }
 
     private void updateSpeed() {
         if(mLastLocation.hasSpeed()){
             mSpeed =  ((mLastLocation.getSpeed()*3600)/1000);
-            Log.d("MY","Speed is "+mSpeed);
             volumeControl((int)mSpeed);
+            Log.d("SPEED","Speed is "+mSpeed);
+
         }
     }
 
@@ -180,6 +259,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     public void cancelNotifications(){
         mNotificationManager.cancelAll();
+        Log.d("NOTIFICATIONS", "Starting Location updates");
+
     }
 
     public class myBinder extends Binder {

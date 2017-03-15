@@ -11,13 +11,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener {
+public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener, Switch.OnCheckedChangeListener {
 
     private final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 2;
@@ -31,11 +33,13 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     SeekBar volBarTwo;
     TextView volTextOne;
     TextView volTextTwo;
+    Switch slowGainModeSwitch;
     protected int mSpeedSetOne;
     protected int mSpeedSetTwo;
     protected int mSpeedSetTwoTotal;
     protected int mVolSetOne;
     protected int mVolSetTwo;
+    protected boolean mSlowGainMode;
     CruiseService.myBinder mBinder;
 
 
@@ -44,14 +48,12 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
-
         checkForPermissions();
         checkPlayServices();
 
         initializePreferences();
         initializeCruiseService();
         initializeUI();
-
 
     }
 
@@ -80,11 +82,12 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         speedTextTwo = (TextView) findViewById(R.id.textSpeedThrTwo);
         volBarTwo = (SeekBar) findViewById(R.id.seekVolThrTwo);
         volTextTwo = (TextView) findViewById(R.id.textVolThrTwo);
-
+        slowGainModeSwitch = (Switch) findViewById(R.id.switchSlowGainMode);
         speedBarOne.setOnSeekBarChangeListener(this);
         speedBarTwo.setOnSeekBarChangeListener(this);
         volBarOne.setOnSeekBarChangeListener(this);
         volBarTwo.setOnSeekBarChangeListener(this);
+        slowGainModeSwitch.setOnCheckedChangeListener(this);
 
         speedBarOne.setMax(100);
         speedBarTwo.setMax(200);
@@ -161,6 +164,9 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     public void onLauncherServiceButtonPressed(View view){
         if(mBound){
             mCruiseService.startLocationUpdates();
+            if(mCruiseService.volarr==null||mCruiseService.boundarr==null){
+                commitValues();
+            }
         }
 
     }
@@ -192,7 +198,9 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
             mCruiseService.endSpeed = mSpeedSetTwoTotal;
             mCruiseService.startVol = mVolSetOne;
             mCruiseService.endVol = mVolSetTwo;
+            mCruiseService.setSlowGainMode(mSlowGainMode);
             mCruiseService.createBoundaries();
+
             return true;
         }else{
             return false;
@@ -271,5 +279,10 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
             mBound = true;
         }
         // Restore state members from saved instance
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        mSlowGainMode = isChecked;
     }
 }
