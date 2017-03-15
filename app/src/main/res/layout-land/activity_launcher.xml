@@ -4,20 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.procrastech.cruisevolume.Launcher">
+    tools:context="com.procrastech.cruisevolume.Launcher"
+    tools:layout_editor_absoluteY="73dp"
+    tools:layout_editor_absoluteX="0dp">
 
     <LinearLayout
-        android:layout_width="368dp"
-        android:layout_height="495dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+
+            <Button
+                android:id="@+id/launchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:onClick="onLauncherServiceButtonPressed"
+                android:text="@string/launchButtonText" />
+
+            <Button
+                android:id="@+id/applyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:onClick="onApplyServiceButtonPressed"
+                android:text="Apply"
+                app:layout_constraintLeft_toRightOf="@+id/launchButton"
+                tools:layout_editor_absoluteY="455dp" />
+
+            <Button
+                android:id="@+id/suspendButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:onClick="onSuspendServiceButtonPressed"
+                android:text="Suspend"
+                app:layout_constraintLeft_toRightOf="@+id/applyButton"
+                tools:layout_editor_absoluteY="455dp" />
+        </LinearLayout>
 
         <ScrollView
             android:layout_width="match_parent"
@@ -192,53 +245,6 @@
 
             </LinearLayout>
         </ScrollView>
-
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent">
-
-            <Button
-                android:id="@+id/launchButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onLauncherServiceButtonPressed"
-                android:text="@string/launchButtonText" />
-
-            <Button
-                android:id="@+id/applyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:onClick="onApplyServiceButtonPressed"
-                android:text="Apply"
-                app:layout_constraintLeft_toRightOf="@+id/launchButton"
-                tools:layout_editor_absoluteY="455dp" />
-
-            <Button
-                android:id="@+id/suspendButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:onClick="onSuspendServiceButtonPressed"
-                android:text="Suspend"
-                app:layout_constraintLeft_toRightOf="@+id/applyButton"
-                tools:layout_editor_absoluteY="455dp" />
-        </LinearLayout>
 
     </LinearLayout>
 

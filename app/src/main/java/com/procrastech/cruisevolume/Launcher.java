@@ -218,8 +218,6 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         commitValues();
     }
 
-
-
     public boolean commitValues(){
         if(mBound){
             mCruiseService.startSpeed = mSpeedSetOne;
