@@ -35,6 +35,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     TextView volTextOne;
     TextView volTextTwo;
     Switch slowGainModeSwitch;
+    Switch serviceSwitch;
     protected int mSpeedSetOne;
     protected int mSpeedSetTwo;
     protected int mSpeedSetTwoTotal;
@@ -55,27 +56,31 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         checkForPermissions();
         checkPlayServices();
 
-        initializeCruiseService();
         initializeUI();
 
 
     }
 
     @Override
-    protected void onPause(){
-        super.onPause();
-
+    protected void onStart(){
+        super.onStart();
+        initializeCruiseService();
     }
 
     @Override
     protected void onStop(){
         super.onStop();
         savePreferences();
+        if(mBound){
+            unbindService(mConnection);
+            mBound = false;
+        }
     }
 
     @Override
     protected void onDestroy(){
         super.onDestroy();
+
     }
 
     private void restorePreferences() {
@@ -103,10 +108,9 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     }
 
     private void initializeCruiseService() {
-        if(!mBound) {
-            Intent intent = new Intent(this, CruiseService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
+        Intent intent = new Intent(this, CruiseService.class);
+        startService(intent);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void initializeUI() {
@@ -119,12 +123,15 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         volBarTwo = (SeekBar) findViewById(R.id.seekVolThrTwo);
         volTextTwo = (TextView) findViewById(R.id.textVolThrTwo);
         slowGainModeSwitch = (Switch) findViewById(R.id.switchSlowGainMode);
+        serviceSwitch = (Switch) findViewById(R.id.switchService);
         speedBarOne.setOnSeekBarChangeListener(this);
         speedBarTwo.setOnSeekBarChangeListener(this);
         volBarOne.setOnSeekBarChangeListener(this);
         volBarTwo.setOnSeekBarChangeListener(this);
         slowGainModeSwitch.setOnCheckedChangeListener(this);
         slowGainModeSwitch.setChecked(mSlowGainMode);
+        serviceSwitch.setOnCheckedChangeListener(this);
+        serviceSwitch.setChecked(false);
         speedBarOne.setMax(100);
         speedBarTwo.setMax(200);
 
@@ -184,6 +191,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
             mBinder = (CruiseService.myBinder) service;
             mCruiseService = mBinder.getService();
             mBound = true;
+            commitValues();
 
             Log.d("MY","Connection established");
         }
@@ -196,27 +204,6 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
         }
     };
-
-    public void onLauncherServiceButtonPressed(View view){
-        if(mBound){
-            if(mCruiseService.volarr==null||mCruiseService.boundarr==null){
-                commitValues();
-            }
-            mCruiseService.startLocationUpdates();
-
-        }
-
-    }
-
-    public void onSuspendServiceButtonPressed(View view){
-        if(mBound){
-            mCruiseService.stopLocationUpdates();
-        }
-    }
-
-    public void onApplyServiceButtonPressed(View view){
-        commitValues();
-    }
 
     public boolean commitValues(){
         if(mBound){
@@ -273,6 +260,8 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         }
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
         updateUI();
+        commitValues();
+
 
     }
 
@@ -296,19 +285,29 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         // Always call the superclass so it can restore the view hierarchy
         super.onRestoreInstanceState(savedInstanceState);
 
-        mBinder = (CruiseService.myBinder) savedInstanceState.getBinder("CruiseServiceBinder");
-        mCruiseService = mBinder.getService();
-        Intent intent = new Intent(this, CruiseService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        //mBinder = (CruiseService.myBinder) savedInstanceState.getBinder("CruiseServiceBinder");
+        //mCruiseService = mBinder.getService();
 
-        if(mCruiseService!=null){
-            mBound = true;
-        }
+
+
         // Restore state members from saved instance
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        mSlowGainMode = isChecked;
+        switch (buttonView.getId()){
+            case R.id.switchSlowGainMode:
+                mSlowGainMode = isChecked;
+                break;
+            case R.id.switchService:
+                if(mBound){
+                    if(isChecked){
+                        mCruiseService.startLocationUpdates();
+                    }else{
+                        mCruiseService.stopLocationUpdates();
+                    }
+                }
+                break;
+        }
     }
 }

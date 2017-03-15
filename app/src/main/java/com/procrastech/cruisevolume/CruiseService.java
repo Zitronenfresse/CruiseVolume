@@ -54,8 +54,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     //TODO: Disclaimer
     //TODO: Local Preference Saves
     //TODO: Initial Wizard
-    //TODO: Handle Exceptions and Weak Signal
-    //TODO: Create App Logo/Icon and revise working title
+    //TODO: Handle Exceptions (Leaked Connection done) and Weak Signal
+    //TODO: Create App Logo/Icon(Done) and revise working title
     //TODO: Analyse memory- and data-usage
     //TODO: performance tests
     //TODO: Option for User Volume Input to disable VolControl
@@ -81,6 +81,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public void onCreate(){
         super.onCreate();
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         createLocationRequest();
         createGoogleAPIClient();
         mGoogleApiClient.connect();
@@ -107,7 +108,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         return mBinder;
     }
 
@@ -252,8 +252,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     @Override
     public boolean onUnbind(Intent i){
-        mNotificationManager.cancelAll();
-        return false;
+        return true;
     }
 
     @Override
@@ -263,8 +262,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     public void cancelNotifications(){
         mNotificationManager.cancelAll();
-        Log.d("NOTIFICATIONS", "Starting Location updates");
-
     }
 
     public class myBinder extends Binder {

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">CruiseVolume</string>
     <string name="launchButtonText">LAUNCH</string>
+    <string name="disclaimerText">Disclaimer: This App intends to regulate your music-volume for you based on speed, acceleration and backgroundnoise. Use at your own risk. Use your brain.</string>
 </resources>
