@@ -149,6 +149,36 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp" />
 
+                <TextView
+                    android:id="@+id/textSetUpdateInterval"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/setUpdateIntervalText" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textUpdateInterval"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5" />
+
+                    <SeekBar
+                        android:id="@+id/seekUpdateInterval"
+                        style="@style/Widget.AppCompat.SeekBar.Discrete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:max="15"
+                        android:progress="1" />
+
+                </LinearLayout>
+
                 <Switch
                     android:id="@+id/switchSlowGainMode"
                     android:layout_width="match_parent"

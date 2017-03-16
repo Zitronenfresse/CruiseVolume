@@ -5,4 +5,5 @@
     <string name="incAdjSwitchText">Incremental Volume-adjustments</string>
     <string name="final_speed_and_volume_level">Final Speed and Volume Level</string>
     <string name="onset_speed_and_volume_level">Onset Speed and Volume Level</string>
+    <string name="setUpdateIntervalText">Set Update Interval for GPS-Requests</string>
 </resources>

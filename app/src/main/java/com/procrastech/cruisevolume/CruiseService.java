@@ -3,7 +3,6 @@ package com.procrastech.cruisevolume;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,7 +16,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.KeyEvent;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,6 +27,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     AudioManager mAudioManager;
     LocationRequest mLocationRequest;
     private double mSpeed;
+    protected int mUpdateInterval;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     protected int startSpeed;
@@ -42,17 +41,18 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     protected boolean updatingLocation = false;
     protected int[] boundarr;
     protected int[] volarr;
-    protected boolean slowGainMode = true;
+    protected boolean slowGainMode;
+    private boolean mConnectedToAPI = false;
 
 
     //TODO: Add expansive logs (Done:VolumeControl)
-    //TODO: Adjustable LocUpdate-frequency
+    //TODO: Adjustable LocUpdate-frequency - DONE
     //TODO: API Level 3.0 Support
     //TODO: Pause-mode when Location is not changing
     //TODO: Awareness API integration
     //TODO: Acceleration-sensor input to trigger single Location-requests
-    //TODO: Disclaimer
-    //TODO: Local Preference Saves
+    //TODO: Disclaimer - DONE(kind of)
+    //TODO: Local Preference Saves - DONE
     //TODO: Initial Wizard
     //TODO: Handle Exceptions (Leaked Connection done) and Weak Signal
     //TODO: Create App Logo/Icon(Done) and revise working title
@@ -114,8 +114,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     private void createLocationRequest() {
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setInterval(mUpdateInterval);
+        mLocationRequest.setFastestInterval(1);
         Log.d("MY", "Location request built");
 
 
@@ -132,16 +132,25 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         }
     }
 
-    protected void startLocationUpdates() {
+    protected void requestLocationUpdates(){
+        createLocationRequest();
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,CruiseService.this);
-        Log.d("LOCATION", "Starting Location updates");
-        updatingLocation = true;
-        showNotification();
-        if(boundarr==null||volarr==null){
-            createBoundaries();
+    }
+
+    protected void startLocationUpdates() {
+
+        if(!updatingLocation){
+            requestLocationUpdates();
+            Log.d("LOCATION", "Starting Location updates");
+            updatingLocation = true;
+            showNotification();
+            if(boundarr==null||volarr==null){
+                createBoundaries();
+            }
         }
+
 
 
     }
@@ -196,6 +205,12 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         slowGainMode = x;
     }
 
+    protected void setUpdateInterval(int x){
+        mUpdateInterval = x;
+        if(mConnectedToAPI&&updatingLocation)requestLocationUpdates();
+        Log.d("MY","Set UpdateInterval to "+ mUpdateInterval);
+    }
+
     private void incrementVol() {
         if(curVol<goalVol){
             curVol++;
@@ -236,13 +251,13 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     @Override
     public void onConnected(Bundle connectionHint) {
         Log.d("MY", "Connected to API");
-
+        mConnectedToAPI = true;
 
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        mConnectedToAPI = false;
     }
 
     @Override

@@ -32,6 +32,8 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     TextView speedTextTwo;
     SeekBar volBarOne;
     SeekBar volBarTwo;
+    SeekBar updateIntervalBar;
+    TextView updateIntervalText;
     TextView volTextOne;
     TextView volTextTwo;
     Switch slowGainModeSwitch;
@@ -42,6 +44,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     protected int mVolSetOne;
     protected int mVolSetTwo;
     protected boolean mSlowGainMode;
+    protected int mUpdateInterval;
     CruiseService.myBinder mBinder;
 
     public static final String PREFS_NAME = "CruisePrefsFile";
@@ -91,6 +94,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         mSpeedSetOne = settings.getInt("speedSetOne",50);
         mSpeedSetTwo = settings.getInt("speedSetTwo", 100);
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
+        mUpdateInterval = settings.getInt("updateInterval",1000);
 
 
     }
@@ -103,6 +107,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         editor.putInt("volSetTwo", mVolSetTwo);
         editor.putInt("speedSetOne", mSpeedSetOne);
         editor.putInt("speedSetTwo", mSpeedSetTwo);
+        editor.putInt("updateInterval",mUpdateInterval);
 
         editor.commit();
     }
@@ -124,10 +129,13 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         volTextTwo = (TextView) findViewById(R.id.textVolThrTwo);
         slowGainModeSwitch = (Switch) findViewById(R.id.switchSlowGainMode);
         serviceSwitch = (Switch) findViewById(R.id.switchService);
+        updateIntervalBar = (SeekBar) findViewById(R.id.seekUpdateInterval);
+        updateIntervalText = (TextView) findViewById(R.id.textUpdateInterval);
         speedBarOne.setOnSeekBarChangeListener(this);
         speedBarTwo.setOnSeekBarChangeListener(this);
         volBarOne.setOnSeekBarChangeListener(this);
         volBarTwo.setOnSeekBarChangeListener(this);
+        updateIntervalBar.setOnSeekBarChangeListener(this);
         slowGainModeSwitch.setOnCheckedChangeListener(this);
         slowGainModeSwitch.setChecked(mSlowGainMode);
         serviceSwitch.setOnCheckedChangeListener(this);
@@ -137,7 +145,8 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
         //speedBarOne.setProgress(mSpeedSetOne);
         speedBarTwo.setProgress(100);
-
+        volBarOne.setProgress(mVolSetOne);
+        volBarTwo.setProgress(mVolSetTwo);
 
     }
 
@@ -214,6 +223,10 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
             mCruiseService.setSlowGainMode(mSlowGainMode);
             mCruiseService.createBoundaries();
 
+            if(mCruiseService.mUpdateInterval!=mUpdateInterval){
+                mCruiseService.setUpdateInterval(mUpdateInterval);
+            }
+
             return true;
         }else{
             return false;
@@ -225,12 +238,12 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
 
         speedTextOne.setText(mSpeedSetOne +" km/h");
         speedTextTwo.setText(mSpeedSetTwoTotal +" km/h");
+        updateIntervalText.setText(mUpdateInterval+ " ms");
         speedBarOne.setProgress(mSpeedSetOne);
         speedBarTwo.setProgress(mSpeedSetTwo);
         volTextOne.setText(mVolSetOne+"");
         volTextTwo.setText(mVolSetTwo+"");
-        volBarOne.setProgress(mVolSetOne);
-        volBarTwo.setProgress(mVolSetTwo);
+
 
     }
 
@@ -257,6 +270,13 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
                     seekBar.setProgress(mVolSetOne + 1);
                 }
                 break;
+            case    R.id.seekUpdateInterval :
+                if(progress==0){
+                    mUpdateInterval = 1;
+                }else{
+                    mUpdateInterval = progress*1000;
+                }
+                break;
         }
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
         updateUI();
@@ -273,24 +293,6 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putBinder("CruiseServiceBinder",mBinder);
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        // Always call the superclass so it can restore the view hierarchy
-        super.onRestoreInstanceState(savedInstanceState);
-
-        //mBinder = (CruiseService.myBinder) savedInstanceState.getBinder("CruiseServiceBinder");
-        //mCruiseService = mBinder.getService();
-
-
-
-        // Restore state members from saved instance
     }
 
     @Override
