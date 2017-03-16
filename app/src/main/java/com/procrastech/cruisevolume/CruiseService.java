@@ -46,7 +46,10 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
 
     //TODO: Add expansive logs (Done:VolumeControl)
+    //TODO: Add GoogleAnalytics
+    //TODO: Translate (at least to german)
     //TODO: Adjustable LocUpdate-frequency - DONE
+    //TODO: Mode to switch between automatic and manual UpdateFrequency (hide/show updateIntervalUI)
     //TODO: API Level 3.0 Support
     //TODO: Pause-mode when Location is not changing
     //TODO: Awareness API integration
@@ -182,8 +185,12 @@ public class CruiseService extends Service implements com.google.android.gms.loc
                 }
 
             }else{
-                if(initVol == -1&&curVol<=volarr[0]){
-                    initVol = curVol;
+                if(initVol == -1){
+                    if(curVol<=volarr[0]){
+                        initVol = curVol;
+                    }else{
+                        initVol = volarr[0];
+                    }
                     Log.d("CONTROL", "VOL CONTROL set Initial Volume to "+initVol+".");
                 }
                 for(int i = boundarr.length-1; i >= 0;i--){
