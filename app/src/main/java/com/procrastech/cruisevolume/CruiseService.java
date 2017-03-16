@@ -45,6 +45,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     private boolean mConnectedToAPI = false;
 
 
+    //TODO: Get Icecream
     //TODO: Add expansive logs (Done:VolumeControl)
     //TODO: Add GoogleAnalytics
     //TODO: Translate (at least to german)
