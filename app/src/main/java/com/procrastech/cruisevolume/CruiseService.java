@@ -45,21 +45,16 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     private boolean mConnectedToAPI = false;
 
 
-    //TODO: Get Icecream
     //TODO: Add expansive logs (Done:VolumeControl)
     //TODO: Add GoogleAnalytics
     //TODO: Translate (at least to german)
-    //TODO: Adjustable LocUpdate-frequency - DONE
     //TODO: Mode to switch between automatic and manual UpdateFrequency (hide/show updateIntervalUI)
     //TODO: API Level 3.0 Support
     //TODO: Pause-mode when Location is not changing
     //TODO: Awareness API integration
     //TODO: Acceleration-sensor input to trigger single Location-requests
-    //TODO: Disclaimer - DONE(kind of)
-    //TODO: Local Preference Saves - DONE
     //TODO: Initial Wizard
     //TODO: Handle Exceptions (Leaked Connection done) and Weak Signal
-    //TODO: Create App Logo/Icon(Done) and revise working title
     //TODO: Analyse memory- and data-usage
     //TODO: performance tests
     //TODO: Option for User Volume Input to disable VolControl
@@ -139,6 +134,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     protected void requestLocationUpdates(){
         createLocationRequest();
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,CruiseService.this);
     }
@@ -287,7 +283,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         mNotificationManager.cancelAll();
     }
 
-    public class myBinder extends Binder {
+    class myBinder extends Binder {
         //TODO: Use Binder as Interface
 
         CruiseService getService(){

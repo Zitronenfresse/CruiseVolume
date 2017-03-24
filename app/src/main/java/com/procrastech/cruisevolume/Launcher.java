@@ -11,7 +11,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -45,6 +44,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     protected int mVolSetTwo;
     protected boolean mSlowGainMode;
     protected int mUpdateInterval;
+    protected int mUpdateIntervalProg;
     CruiseService.myBinder mBinder;
 
     public static final String PREFS_NAME = "CruisePrefsFile";
@@ -83,6 +83,10 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
     @Override
     protected void onDestroy(){
         super.onDestroy();
+        if(isFinishing()){
+            mCruiseService.cancelNotifications();
+            stopService(new Intent(this,CruiseService.class));
+        }
 
     }
 
@@ -95,6 +99,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         mSpeedSetTwo = settings.getInt("speedSetTwo", 100);
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
         mUpdateInterval = settings.getInt("updateInterval",1000);
+        mUpdateIntervalProg = settings.getInt("updateIntervalProg",1);
 
 
     }
@@ -108,8 +113,9 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         editor.putInt("speedSetOne", mSpeedSetOne);
         editor.putInt("speedSetTwo", mSpeedSetTwo);
         editor.putInt("updateInterval",mUpdateInterval);
+        editor.putInt("updateIntervalProg",mUpdateIntervalProg);
 
-        editor.commit();
+        editor.apply();
     }
 
     private void initializeCruiseService() {
@@ -142,9 +148,9 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         serviceSwitch.setChecked(false);
         speedBarOne.setMax(100);
         speedBarTwo.setMax(200);
-
-        //speedBarOne.setProgress(mSpeedSetOne);
-        speedBarTwo.setProgress(100);
+        updateIntervalBar.setProgress(mUpdateIntervalProg);
+        speedBarOne.setProgress(mSpeedSetOne);
+        speedBarTwo.setProgress(mSpeedSetTwo);
         volBarOne.setProgress(mVolSetOne);
         volBarTwo.setProgress(mVolSetTwo);
 
@@ -178,7 +184,6 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
-                return;
             }
 
             // other 'case' lines to check for other
@@ -239,8 +244,6 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         speedTextOne.setText(mSpeedSetOne +" km/h");
         speedTextTwo.setText(mSpeedSetTwoTotal +" km/h");
         updateIntervalText.setText(mUpdateInterval+ " ms");
-        speedBarOne.setProgress(mSpeedSetOne);
-        speedBarTwo.setProgress(mSpeedSetTwo);
         volTextOne.setText(mVolSetOne+"");
         volTextTwo.setText(mVolSetTwo+"");
 
@@ -271,14 +274,15 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
                 }
                 break;
             case    R.id.seekUpdateInterval :
-                if(progress==0){
-                    mUpdateInterval = 1;
-                }else{
-                    mUpdateInterval = progress*1000;
-                }
+                mUpdateIntervalProg = progress;
                 break;
         }
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
+        if(mUpdateIntervalProg==0){
+            mUpdateInterval = 1;
+        }else{
+            mUpdateInterval = mUpdateIntervalProg*1000;
+        }
         updateUI();
         commitValues();
 
