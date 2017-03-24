@@ -204,8 +204,8 @@
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="Regulate Volume"
-            android:textOff="Not Regulating Volume"
-            android:textOn="Regulating Volume" />
+            android:textOff="Off"
+            android:textOn="On" />
 
     </LinearLayout>
 
