@@ -96,7 +96,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         mVolSetOne = settings.getInt("volSetOne",5);
         mVolSetTwo = settings.getInt("volSetTwo",10);
         mSpeedSetOne = settings.getInt("speedSetOne",50);
-        mSpeedSetTwo = settings.getInt("speedSetTwo", 100);
+        mSpeedSetTwo = settings.getInt("speedSetTwo", 99);
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
         mUpdateInterval = settings.getInt("updateInterval",1000);
         mUpdateIntervalProg = settings.getInt("updateIntervalProg",1);
@@ -115,7 +115,7 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         editor.putInt("updateInterval",mUpdateInterval);
         editor.putInt("updateIntervalProg",mUpdateIntervalProg);
 
-        editor.apply();
+        editor.commit();
     }
 
     private void initializeCruiseService() {
@@ -148,6 +148,12 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         serviceSwitch.setChecked(false);
         speedBarOne.setMax(100);
         speedBarTwo.setMax(200);
+
+        Log.d("Prog","2nd speed prog val at init "+mSpeedSetTwo);
+
+        speedBarTwo.setProgress(100);
+
+        Log.d("Prog","2nd speed prog val at init "+mSpeedSetTwo);
         updateIntervalBar.setProgress(mUpdateIntervalProg);
         speedBarOne.setProgress(mSpeedSetOne);
         speedBarTwo.setProgress(mSpeedSetTwo);
