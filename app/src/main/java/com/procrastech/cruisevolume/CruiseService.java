@@ -45,18 +45,15 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     private boolean mConnectedToAPI = false;
 
 
-    //TODO: Add expansive logs (Done:VolumeControl)
+    //TODO: Separate Service from SettingsActivity
     //TODO: Add GoogleAnalytics
     //TODO: Translate (at least to german)
     //TODO: Mode to switch between automatic and manual UpdateFrequency (hide/show updateIntervalUI)
-    //TODO: API Level 3.0 Support
     //TODO: Pause-mode when Location is not changing
     //TODO: Awareness API integration
     //TODO: Acceleration-sensor input to trigger single Location-requests
     //TODO: Initial Wizard
-    //TODO: Handle Exceptions (Leaked Connection done) and Weak Signal
     //TODO: Analyse memory- and data-usage
-    //TODO: performance tests
     //TODO: Option for User Volume Input to disable VolControl
 
     protected void createBoundaries(){
