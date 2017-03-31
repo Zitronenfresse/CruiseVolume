@@ -94,7 +94,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         mBuilder.setOngoing(true);
         Intent targetIntent = new Intent(this, Launcher.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(contentIntent);
+        mBuilder.addAction(R.drawable.common_google_signin_btn_icon_light,"Stop",contentIntent);
+        mBuilder.addAction(R.drawable.common_google_signin_btn_icon_light,"Settings",contentIntent);
 
         mNotificationManager.notify(11, mBuilder.build());
         Log.d("NOTIFICATIONS", "Building Notification");

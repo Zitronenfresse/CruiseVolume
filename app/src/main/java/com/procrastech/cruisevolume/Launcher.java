@@ -147,13 +147,10 @@ public class Launcher extends AppCompatActivity implements SeekBar.OnSeekBarChan
         serviceSwitch.setOnCheckedChangeListener(this);
         serviceSwitch.setChecked(false);
         speedBarOne.setMax(100);
-        speedBarTwo.setMax(200);
+        speedBarTwo.setMax(100);
 
-        Log.d("Prog","2nd speed prog val at init "+mSpeedSetTwo);
 
-        speedBarTwo.setProgress(100);
 
-        Log.d("Prog","2nd speed prog val at init "+mSpeedSetTwo);
         updateIntervalBar.setProgress(mUpdateIntervalProg);
         speedBarOne.setProgress(mSpeedSetOne);
         speedBarTwo.setProgress(mSpeedSetTwo);
