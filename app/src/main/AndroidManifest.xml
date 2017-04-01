@@ -12,35 +12,47 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Launcher"
-            android:launchMode="singleInstance">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
-
+            android:name=".translucentLauncher"
+            android:theme="@style/Theme.AppCompat.Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
 
+
         <meta-data
-            android:value="@integer/google_play_services_version"
             android:name="com.google.android.gms.version"
-            />
-        <meta-data android:name="android.max_aspect" android:value="2.1" />
-
-
-
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
 
         <service
             android:name=".CruiseService"
             android:enabled="true"
             android:exported="true"
-            ></service>
+            android:process="com.procrastech.cruisevolume.service">
+            <intent-filter>
+                <action android:name="com.procrastech.cruisevolume.ACTION_STOP_UPDATES" />
+                <action android:name="com.procrastech.cruisevolume.ACTION_START_SERVICE" />
+                <action android:name="com.procrastech.cruisevolume.ACTION_STOP_SERVICE" />
+                <action android:name="com.procrastech.cruisevolume.ACTION_UPDATE_PREFS" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>

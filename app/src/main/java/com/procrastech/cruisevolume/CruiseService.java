@@ -1,10 +1,12 @@
 package com.procrastech.cruisevolume;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.AudioManager;
@@ -19,8 +21,12 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import static com.procrastech.cruisevolume.SettingsActivity.PREFS_NAME;
 
 public class CruiseService extends Service implements com.google.android.gms.location.LocationListener,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
     private final myBinder mBinder = new myBinder();
@@ -38,12 +44,16 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     protected int curVol;
     protected int initVol = -1;
     NotificationManager mNotificationManager;
-    protected boolean updatingLocation = false;
+    protected static boolean updatingLocation;
     protected int[] boundarr;
     protected int[] volarr;
     protected boolean slowGainMode;
     private boolean mConnectedToAPI = false;
-
+    public static final String ACTION_STOP_UPDATES = "com.procrastech.cruisevolume.ACTION_STOP_UPDATES";
+    public static final String ACTION_STOP_SERVICE = "com.procrastech.cruisevolume.ACTION_STOP_SERVICE";
+    public static final String ACTION_START_UPDATES = "com.procrastech.cruisevolume.ACTION_START_UPDATES";
+    public static final String ACTION_UPDATE_PREFS = "com.procrastech.cruisevolume.ACTION_UPDATE_PREFS";
+    private boolean startLocationUpdatesOnAPIConnected = false;
 
     //TODO: Separate Service from SettingsActivity
     //TODO: Add GoogleAnalytics
@@ -55,6 +65,93 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     //TODO: Initial Wizard
     //TODO: Analyse memory- and data-usage
     //TODO: Option for User Volume Input to disable VolControl
+
+
+    @Override
+    public int onStartCommand(Intent intent,int flags,int startId){
+        Log.d("myIntent","Onstartcommand called");
+        super.onStartCommand(intent,flags,startId);
+        if(intent!=null){
+            handleIntent(intent);
+        }
+        startForeground(1,buildForegroundNotification());
+
+        return START_REDELIVER_INTENT;
+    }
+
+    private void restorePreferences() {
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        slowGainMode = settings.getBoolean("slowGainMode", true);
+        startVol = settings.getInt("volSetOne",5);
+        endVol = settings.getInt("volSetTwo",10);
+        startSpeed = settings.getInt("speedSetOne",50);
+        endSpeed = settings.getInt("speedSetTwo", 99) + startSpeed;
+        mUpdateInterval = settings.getInt("updateInterval",1000);
+
+
+    }
+
+    private void handleIntent(Intent intent) {
+        String action = "";
+        if(intent.getAction()!=null){
+            action = intent.getAction();
+
+        }
+
+
+        Log.d("myIntent","Intent received, action is:" + action);
+
+        switch (action){
+            case ACTION_STOP_UPDATES :
+                updatingLocation = false;
+
+                stopLocationUpdates();
+                break;
+            case ACTION_START_UPDATES :
+                updatingLocation = true;
+
+                if(mConnectedToAPI){
+                    startLocationUpdates();
+                }else{
+                    startLocationUpdatesOnAPIConnected = true;
+                }
+                break;
+            case ACTION_STOP_SERVICE :
+                if(mConnectedToAPI){
+                    stopLocationUpdates();
+                }
+                stopForeground(true);
+                stopSelf();
+                break;
+            case ACTION_UPDATE_PREFS :
+                Boolean slowgain = intent.getBooleanExtra("slowGainMode",slowGainMode);
+                int startVolume = intent.getIntExtra("startVol",startVol);
+                int endVolume = intent.getIntExtra("endVol",endVol);
+                int startingSpeed = intent.getIntExtra("startSpeed",startSpeed);
+                int endingSpeed = intent.getIntExtra("endSpeed",endSpeed);
+                int updateInterval = intent.getIntExtra("mUpdateInterval",mUpdateInterval);
+                updateParams(slowgain,startingSpeed,endingSpeed,startVolume,endVolume,updateInterval);
+                createBoundaries();
+                break;
+            default:
+        }
+    }
+
+    private void updateParams(boolean slowgain, int startspeed, int endspeed, int startVol, int endVol,int updateInterval) {
+        slowGainMode = slowgain;
+        startSpeed = startspeed;
+        endSpeed = endspeed;
+        this.startVol = startVol;
+        this.endVol = endVol;
+        if(mConnectedToAPI&&updatingLocation&&mUpdateInterval!=updateInterval){
+            mUpdateInterval = updateInterval;
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+            requestLocationUpdates();
+        }else{
+            mUpdateInterval = updateInterval;
+        }
+    }
+
 
     protected void createBoundaries(){
         int number = endVol - startVol;
@@ -76,6 +173,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     @Override
     public void onCreate(){
         super.onCreate();
+
+        restorePreferences();
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         createLocationRequest();
@@ -83,24 +182,40 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         mGoogleApiClient.connect();
     }
 
-    private void showNotification(){
-
-
+    private Notification buildForegroundNotification(){
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
         mBuilder.setContentTitle("CruiseVolume");
-        mBuilder.setContentText("CruiseVolume is running");
         mBuilder.setSmallIcon(R.drawable.noticon);
         mBuilder.setOngoing(true);
-        Intent targetIntent = new Intent(this, Launcher.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.common_google_signin_btn_icon_light,"Stop",contentIntent);
-        mBuilder.addAction(R.drawable.common_google_signin_btn_icon_light,"Settings",contentIntent);
 
-        mNotificationManager.notify(11, mBuilder.build());
-        Log.d("NOTIFICATIONS", "Building Notification");
+        Intent stopTargetIntent = new Intent(this, CruiseService.class);
+        stopTargetIntent.setAction(ACTION_STOP_SERVICE);
+        PendingIntent stopIntent = PendingIntent.getService(this, 0, stopTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.addAction(R.drawable.rotatinglogo,"Stop",stopIntent);
 
+        Intent pauseTargetIntent = new Intent(this, CruiseService.class);
+        String pauseResume;
+        if(updatingLocation){
+            pauseResume = "Pause";
+            pauseTargetIntent.setAction(ACTION_STOP_UPDATES);
+            mBuilder.setContentText("is running");
+        }else{
+            pauseTargetIntent.setAction(ACTION_START_UPDATES);
+            pauseResume = "Resume";
+            mBuilder.setContentText("is paused");
+        }
+        PendingIntent pauseIntent = PendingIntent.getService(this, 0, pauseTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.addAction(R.drawable.rotatinglogo,pauseResume,pauseIntent);
+
+        Intent settingsTargetIntent = new Intent(this, SettingsActivity.class);
+        PendingIntent settingsIntent = PendingIntent.getActivity(this, 0, settingsTargetIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.addAction(R.drawable.rotatinglogo,"Settings",settingsIntent);
+
+        mBuilder.setPriority(Notification.PRIORITY_MAX);
+        return mBuilder.build();
     }
+
 
     @Nullable
     @Override
@@ -139,24 +254,19 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     protected void startLocationUpdates() {
 
-        if(!updatingLocation){
-            requestLocationUpdates();
-            Log.d("LOCATION", "Starting Location updates");
-            updatingLocation = true;
-            showNotification();
-            if(boundarr==null||volarr==null){
-                createBoundaries();
-            }
+        requestLocationUpdates();
+        Log.d("LOCATION", "Starting Location updates");
+        updatingLocation = true;
+        if(boundarr==null||volarr==null){
+            createBoundaries();
         }
 
-
-
     }
+
 
     protected void stopLocationUpdates(){
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         updatingLocation = false;
-        cancelNotifications();
         Log.d("LOCATION", "Stopping Location updates");
 
     }
@@ -203,14 +313,9 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         }
     }
 
-    protected void setSlowGainMode(boolean x){
-        slowGainMode = x;
-    }
-
-    protected void setUpdateInterval(int x){
-        mUpdateInterval = x;
-        if(mConnectedToAPI&&updatingLocation)requestLocationUpdates();
-        Log.d("MY","Set UpdateInterval to "+ mUpdateInterval);
+    @Override public void onDestroy(){
+        cancelNotifications();
+        super.onDestroy();
     }
 
     private void incrementVol() {
@@ -254,7 +359,10 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public void onConnected(Bundle connectionHint) {
         Log.d("MY", "Connected to API");
         mConnectedToAPI = true;
-
+        if(startLocationUpdatesOnAPIConnected){
+            startLocationUpdates();
+            startLocationUpdatesOnAPIConnected = false;
+        }
     }
 
     @Override

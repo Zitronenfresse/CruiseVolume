@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    <item android:drawable="@drawable/logorotating1" android:duration="40" />
+    <item android:drawable="@drawable/logorotating2" android:duration="40" />
+    <item android:drawable="@drawable/logorotating3" android:duration="40" />
+    <item android:drawable="@drawable/logorotating4" android:duration="40" />
+    <item android:drawable="@drawable/logorotating5" android:duration="40" />
+    <item android:drawable="@drawable/logorotating6" android:duration="40" />
+    <item android:drawable="@drawable/logorotating7" android:duration="40" />
+    <item android:drawable="@drawable/logorotating8" android:duration="40" />
+    <item android:drawable="@drawable/logorotating9" android:duration="40" />
+    <item android:drawable="@drawable/logorotating10" android:duration="40" />
+    <item android:drawable="@drawable/logorotating11" android:duration="40" />
+    <item android:drawable="@drawable/logorotating12" android:duration="40" />
+</animation-list>
