@@ -58,7 +58,7 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        //initAds();
+        initAds();
         restorePreferences();
         initializeUI();
 
@@ -66,7 +66,7 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
     }
 
     private void initAds() {
-        MobileAds.initialize(getApplicationContext(), "ca-app-pub-3940256099942544~3347511713");
+        MobileAds.initialize(getApplicationContext(), "ca-app-pub-4077367878822895~3749568563");
 
         mAdView = (AdView) findViewById(R.id.adView);
 
@@ -255,5 +255,27 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         updateParams();
     }
 
+    @Override
+    public void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
+        super.onDestroy();
+    }
 }
