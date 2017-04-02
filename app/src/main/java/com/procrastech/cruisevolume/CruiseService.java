@@ -8,6 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.media.AudioManager;
 import android.os.Binder;
@@ -21,19 +25,19 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderApi;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import static com.procrastech.cruisevolume.SettingsActivity.PREFS_NAME;
 
-public class CruiseService extends Service implements com.google.android.gms.location.LocationListener,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
+public class CruiseService extends Service implements com.google.android.gms.location.LocationListener,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,SensorEventListener{
     private final myBinder mBinder = new myBinder();
     AudioManager mAudioManager;
     LocationRequest mLocationRequest;
     private double mSpeed;
     protected int mUpdateInterval;
+    protected int cachedUpdateInterval = -1;
+    protected int quickUpdateCounter = 0;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     protected int startSpeed;
@@ -48,6 +52,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     protected int[] boundarr;
     protected int[] volarr;
     protected boolean slowGainMode;
+    protected boolean accMode;
     private boolean mConnectedToAPI = false;
     public static final String ACTION_STOP_UPDATES = "com.procrastech.cruisevolume.ACTION_STOP_UPDATES";
     public static final String ACTION_STOP_SERVICE = "com.procrastech.cruisevolume.ACTION_STOP_SERVICE";
@@ -55,17 +60,52 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public static final String ACTION_UPDATE_PREFS = "com.procrastech.cruisevolume.ACTION_UPDATE_PREFS";
     private boolean startLocationUpdatesOnAPIConnected = false;
 
-    //TODO: Separate Service from SettingsActivity
-    //TODO: Add GoogleAnalytics
+    private int accelerationThreshold = 5;
+
+    private SensorManager senSensorManager;
+    private Sensor senLinearAcceleration;
+
+    //TODO: Profiles
     //TODO: Translate (at least to german)
-    //TODO: Mode to switch between automatic and manual UpdateFrequency (hide/show updateIntervalUI)
     //TODO: Pause-mode when Location is not changing
     //TODO: Awareness API integration
     //TODO: Acceleration-sensor input to trigger single Location-requests
     //TODO: Initial Wizard
-    //TODO: Analyse memory- and data-usage
     //TODO: Option for User Volume Input to disable VolControl
 
+
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        Sensor mySensor = sensorEvent.sensor;
+
+        if (mySensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+            float x = sensorEvent.values[0];
+            float y = sensorEvent.values[1];
+            float z = sensorEvent.values[2];
+
+            double a = Math.sqrt(x*x+y*y+z*z);
+
+            if(a>accelerationThreshold){
+                Log.d("ACCELERATION","threshold triggered " + a);
+                requestQuickLocationUpdates();
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    private void requestQuickLocationUpdates(){
+        if(mConnectedToAPI&&updatingLocation&&accMode&&cachedUpdateInterval==-1&&mUpdateInterval>2000){
+            cachedUpdateInterval = mUpdateInterval;
+            mUpdateInterval = 1;
+            quickUpdateCounter = 10;
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+            requestLocationUpdates();
+            Log.d("Location","Requesting Quick Loc Updates");
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent,int flags,int startId){
@@ -87,7 +127,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         startSpeed = settings.getInt("speedSetOne",50);
         endSpeed = settings.getInt("speedSetTwo", 99) + startSpeed;
         mUpdateInterval = settings.getInt("updateInterval",1000);
-
+        accelerationThreshold = settings.getInt("accelerationThreshold",10);
+        accMode = settings.getBoolean("accMode",false);
 
     }
 
@@ -125,24 +166,28 @@ public class CruiseService extends Service implements com.google.android.gms.loc
                 break;
             case ACTION_UPDATE_PREFS :
                 Boolean slowgain = intent.getBooleanExtra("slowGainMode",slowGainMode);
+                Boolean accM = intent.getBooleanExtra("accMode",accMode);
                 int startVolume = intent.getIntExtra("startVol",startVol);
                 int endVolume = intent.getIntExtra("endVol",endVol);
                 int startingSpeed = intent.getIntExtra("startSpeed",startSpeed);
                 int endingSpeed = intent.getIntExtra("endSpeed",endSpeed);
                 int updateInterval = intent.getIntExtra("mUpdateInterval",mUpdateInterval);
-                updateParams(slowgain,startingSpeed,endingSpeed,startVolume,endVolume,updateInterval);
+                int threshold = intent.getIntExtra("accelerationThreshold",accelerationThreshold);
+                updateParams(slowgain,startingSpeed,endingSpeed,startVolume,endVolume,updateInterval,threshold,accM);
                 createBoundaries();
                 break;
             default:
         }
     }
 
-    private void updateParams(boolean slowgain, int startspeed, int endspeed, int startVol, int endVol,int updateInterval) {
+    private void updateParams(boolean slowgain, int startspeed, int endspeed, int startVol, int endVol,int updateInterval,int accelerationThreshold, boolean accMode) {
         slowGainMode = slowgain;
+        this.accMode = accMode;
         startSpeed = startspeed;
         endSpeed = endspeed;
         this.startVol = startVol;
         this.endVol = endVol;
+        this.accelerationThreshold = accelerationThreshold;
         if(mConnectedToAPI&&updatingLocation&&mUpdateInterval!=updateInterval){
             mUpdateInterval = updateInterval;
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
@@ -180,6 +225,13 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         createLocationRequest();
         createGoogleAPIClient();
         mGoogleApiClient.connect();
+        initAccSensor();
+    }
+
+    private void initAccSensor() {
+        senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        senLinearAcceleration = senSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        senSensorManager.registerListener(this, senLinearAcceleration, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private Notification buildForegroundNotification(){
@@ -273,6 +325,17 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     @Override
     public void onLocationChanged(Location location) {
+        if(cachedUpdateInterval!=-1){
+            if(quickUpdateCounter > 0){
+                quickUpdateCounter--;
+            }else{
+                mUpdateInterval = cachedUpdateInterval;
+                cachedUpdateInterval = -1;
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+                requestLocationUpdates();
+            }
+        }
+
         mLastLocation = location;
         updateSpeed();
     }
@@ -388,6 +451,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public void cancelNotifications(){
         mNotificationManager.cancelAll();
     }
+
+
 
     class myBinder extends Binder {
         //TODO: Use Binder as Interface

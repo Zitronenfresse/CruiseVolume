@@ -1,10 +1,16 @@
 package com.procrastech.cruisevolume;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -12,6 +18,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener, Switch.OnCheckedChangeListener  {
+
+    private AdView mAdView;
+    private static final String TAG = "SettingsActivity";
+
 
     SeekBar speedBarOne;
     SeekBar speedBarTwo;
@@ -24,14 +34,19 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
     TextView volTextOne;
     TextView volTextTwo;
     Switch slowGainModeSwitch;
+    Switch accModeSwitch;
+    TextView thrText;
+    SeekBar thrBar;
     protected int mSpeedSetOne;
     protected int mSpeedSetTwo;
     protected int mSpeedSetTwoTotal;
     protected int mVolSetOne;
     protected int mVolSetTwo;
     protected boolean mSlowGainMode;
+    protected boolean accMode;
     protected int mUpdateInterval;
     protected int mUpdateIntervalProg;
+    protected int accelerationThreshold;
     ImageView rotatingLogoView;
     AnimationDrawable rotatingLogoAnimation;
 
@@ -42,12 +57,22 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
+        //initAds();
         restorePreferences();
         initializeUI();
 
 
     }
+
+    private void initAds() {
+        MobileAds.initialize(getApplicationContext(), "ca-app-pub-3940256099942544~3347511713");
+
+        mAdView = (AdView) findViewById(R.id.adView);
+
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).addTestDevice("B285B4A48DCD75D67F18B862A24B5AFD").build();
+        mAdView.loadAd(adRequest);
+    }
+
 
 
     private void restorePreferences() {
@@ -60,6 +85,8 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
         mUpdateInterval = settings.getInt("updateInterval",1000);
         mUpdateIntervalProg = settings.getInt("updateIntervalProg",1);
+        accelerationThreshold = settings.getInt("accelerationThreshold",5);
+        accMode = settings.getBoolean("accMode",false);
 
 
     }
@@ -74,7 +101,8 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         editor.putInt("speedSetTwo", mSpeedSetTwo);
         editor.putInt("updateInterval",mUpdateInterval);
         editor.putInt("updateIntervalProg",mUpdateIntervalProg);
-
+        editor.putInt("accelerationThreshold",accelerationThreshold);
+        editor.putBoolean("accMode",accMode);
         editor.apply();
     }
 
@@ -84,6 +112,9 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         rotatingLogoAnimation.start();
 
 
+        thrBar = (SeekBar) findViewById(R.id.seekThreshold);
+        thrText = (TextView) findViewById(R.id.textThreshold);
+        accModeSwitch = (Switch) findViewById(R.id.switchAccMode);
         speedBarOne = (SeekBar) findViewById(R.id.seekSpeedThrOne);
         speedTextOne = (TextView) findViewById(R.id.textSpeedThrOne);
         volBarOne = (SeekBar) findViewById(R.id.seekVolThrOne);
@@ -100,13 +131,17 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         volBarOne.setOnSeekBarChangeListener(this);
         volBarTwo.setOnSeekBarChangeListener(this);
         updateIntervalBar.setOnSeekBarChangeListener(this);
+        thrBar.setOnSeekBarChangeListener(this);
         slowGainModeSwitch.setOnCheckedChangeListener(this);
         slowGainModeSwitch.setChecked(mSlowGainMode);
+        accModeSwitch.setOnCheckedChangeListener(this);
+        accModeSwitch.setChecked(accMode);
         speedBarOne.setMax(100);
         speedBarTwo.setMax(100);
 
 
 
+        thrBar.setProgress(accelerationThreshold);
         updateIntervalBar.setProgress(mUpdateIntervalProg);
         speedBarOne.setProgress(mSpeedSetOne);
         speedBarTwo.setProgress(mSpeedSetTwo);
@@ -123,6 +158,7 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         updateIntervalText.setText(mUpdateInterval+ " ms");
         volTextOne.setText(mVolSetOne+"");
         volTextTwo.setText(mVolSetTwo+"");
+        thrText.setText(accelerationThreshold+"");
 
 
     }
@@ -162,6 +198,9 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
             case    R.id.seekUpdateInterval :
                 mUpdateIntervalProg = progress;
                 break;
+            case    R.id.seekThreshold :
+                accelerationThreshold = progress;
+                break;
         }
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
         if(mUpdateIntervalProg==0){
@@ -173,12 +212,14 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         savePreferences();
         Intent startServiceIntent = new Intent(this,CruiseService.class);
         startServiceIntent.setAction(CruiseService.ACTION_UPDATE_PREFS);
+        startServiceIntent.putExtra("accMode",accMode);
         startServiceIntent.putExtra("slowGainMode",mSlowGainMode);
         startServiceIntent.putExtra("startSpeed",mSpeedSetOne);
         startServiceIntent.putExtra("endSpeed",mSpeedSetTwoTotal);
         startServiceIntent.putExtra("startVol",mVolSetOne);
         startServiceIntent.putExtra("endVol",mVolSetTwo);
         startServiceIntent.putExtra("mUpdateInterval",mUpdateInterval);
+        startServiceIntent.putExtra("accelerationThreshold",accelerationThreshold);
         startService(startServiceIntent);
 
 
@@ -200,6 +241,9 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         switch (buttonView.getId()){
             case R.id.switchSlowGainMode:
                 mSlowGainMode = isChecked;
+                break;
+            case R.id.switchAccMode :
+                accMode = isChecked;
                 break;
 
         }
