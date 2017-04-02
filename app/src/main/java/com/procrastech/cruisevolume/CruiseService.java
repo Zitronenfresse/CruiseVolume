@@ -69,7 +69,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     //TODO: Translate (at least to german)
     //TODO: Pause-mode when Location is not changing
     //TODO: Awareness API integration
-    //TODO: Acceleration-sensor input to trigger single Location-requests
+    //TODO: Calculate Speed inbetween updates via Linear Acceleration and correct at update
     //TODO: Initial Wizard
     //TODO: Option for User Volume Input to disable VolControl
 
@@ -77,7 +77,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public void onSensorChanged(SensorEvent sensorEvent) {
         Sensor mySensor = sensorEvent.sensor;
 
-        if (mySensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+        if (mySensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION&&updatingLocation) {
             float x = sensorEvent.values[0];
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
@@ -86,6 +86,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
             if(a>accelerationThreshold){
                 Log.d("ACCELERATION","threshold triggered " + a);
+                Log.d("ACCELERATION","updating = "+updatingLocation+"  connectedToAPI = " +mConnectedToAPI+"  accmode = "+accMode+"  updateInterval = "+mUpdateInterval +  "  cachedUpdateInterval = "+ cachedUpdateInterval);
                 requestQuickLocationUpdates();
             }
         }
@@ -97,10 +98,10 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
     private void requestQuickLocationUpdates(){
-        if(mConnectedToAPI&&updatingLocation&&accMode&&cachedUpdateInterval==-1&&mUpdateInterval>2000){
+        if(mConnectedToAPI&&updatingLocation&&accMode&&cachedUpdateInterval==-1&&mUpdateInterval>3000){
             cachedUpdateInterval = mUpdateInterval;
             mUpdateInterval = 1;
-            quickUpdateCounter = 10;
+            quickUpdateCounter = 30;
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
             requestLocationUpdates();
             Log.d("Location","Requesting Quick Loc Updates");
@@ -325,6 +326,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d("LOCATION","updating = "+updatingLocation+"  connectedToAPI = " +mConnectedToAPI+"  accmode = "+accMode+"  updateInterval = "+mUpdateInterval +  "  cachedUpdateInterval = "+ cachedUpdateInterval);
+
         if(cachedUpdateInterval!=-1){
             if(quickUpdateCounter > 0){
                 quickUpdateCounter--;

@@ -47,6 +47,7 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
     protected int mUpdateInterval;
     protected int mUpdateIntervalProg;
     protected int accelerationThreshold;
+    protected int accelerationThresholdProg;
     ImageView rotatingLogoView;
     AnimationDrawable rotatingLogoAnimation;
 
@@ -141,7 +142,7 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
 
 
 
-        thrBar.setProgress(accelerationThreshold);
+        thrBar.setProgress(accelerationThresholdProg);
         updateIntervalBar.setProgress(mUpdateIntervalProg);
         speedBarOne.setProgress(mSpeedSetOne);
         speedBarTwo.setProgress(mSpeedSetTwo);
@@ -199,7 +200,8 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
                 mUpdateIntervalProg = progress;
                 break;
             case    R.id.seekThreshold :
-                accelerationThreshold = progress;
+                accelerationThresholdProg = progress;
+                accelerationThreshold = accelerationThresholdProg + 5;
                 break;
         }
         mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
@@ -210,6 +212,12 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         }
         updateUI();
         savePreferences();
+        updateParams();
+
+
+    }
+
+    private void updateParams(){
         Intent startServiceIntent = new Intent(this,CruiseService.class);
         startServiceIntent.setAction(CruiseService.ACTION_UPDATE_PREFS);
         startServiceIntent.putExtra("accMode",accMode);
@@ -221,8 +229,6 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         startServiceIntent.putExtra("mUpdateInterval",mUpdateInterval);
         startServiceIntent.putExtra("accelerationThreshold",accelerationThreshold);
         startService(startServiceIntent);
-
-
     }
 
 
@@ -245,8 +251,8 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
             case R.id.switchAccMode :
                 accMode = isChecked;
                 break;
-
         }
+        updateParams();
     }
 
 
