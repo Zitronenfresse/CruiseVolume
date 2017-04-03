@@ -87,6 +87,7 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         mUpdateInterval = settings.getInt("updateInterval",1000);
         mUpdateIntervalProg = settings.getInt("updateIntervalProg",1);
         accelerationThreshold = settings.getInt("accelerationThreshold",5);
+        accelerationThresholdProg = settings.getInt("accelerationThresholdProg",10);
         accMode = settings.getBoolean("accMode",false);
 
 
@@ -103,6 +104,7 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         editor.putInt("updateInterval",mUpdateInterval);
         editor.putInt("updateIntervalProg",mUpdateIntervalProg);
         editor.putInt("accelerationThreshold",accelerationThreshold);
+        editor.putInt("accelerationThresholdProg",accelerationThresholdProg);
         editor.putBoolean("accMode",accMode);
         editor.apply();
     }
