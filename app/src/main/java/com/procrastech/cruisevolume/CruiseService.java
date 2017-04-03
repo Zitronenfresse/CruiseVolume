@@ -245,7 +245,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         Intent stopTargetIntent = new Intent(this, CruiseService.class);
         stopTargetIntent.setAction(ACTION_STOP_SERVICE);
         PendingIntent stopIntent = PendingIntent.getService(this, 0, stopTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.rotatinglogo,"Stop",stopIntent);
+        mBuilder.addAction(R.drawable.ic_not_stop,"Stop",stopIntent);
 
         Intent pauseTargetIntent = new Intent(this, CruiseService.class);
         String pauseResume;
@@ -259,11 +259,11 @@ public class CruiseService extends Service implements com.google.android.gms.loc
             mBuilder.setContentText("is paused");
         }
         PendingIntent pauseIntent = PendingIntent.getService(this, 0, pauseTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.rotatinglogo,pauseResume,pauseIntent);
+        mBuilder.addAction(R.drawable.ic_not_PAUSE,pauseResume,pauseIntent);
 
         Intent settingsTargetIntent = new Intent(this, SettingsActivity.class);
         PendingIntent settingsIntent = PendingIntent.getActivity(this, 0, settingsTargetIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.rotatinglogo,"Settings",settingsIntent);
+        mBuilder.addAction(R.drawable.ic_not_settings,"Settings",settingsIntent);
 
         mBuilder.setPriority(Notification.PRIORITY_MAX);
         return mBuilder.build();
