@@ -14,31 +14,48 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 public class translucentLauncher extends AppCompatActivity {
 
+    private final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 2;
+    private static String action = "";
+    private static boolean requestCalledBack = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
 
-        String action = "";
+        action = "";
         if(intent.getAction()!=null){
             action = intent.getAction();
         }
 
         if(checkPlayServices()){
-            checkForPermissions();
+            if(checkForPermissions()){
+                handleIntent();
+            };
         }
 
 
+
+
+
+
+    }
+
+    private void handleIntent(){
+        Log.d("Intent", "Intentaction is "+action+".");
 
         switch (action){
             case "" :
                 initializeCruiseService();
                 break;
+            case Intent.ACTION_MAIN :
+                initializeCruiseService();
+                break;
             default:
         }
         finish();
-
     }
 
     private void initializeCruiseService() {
@@ -50,13 +67,15 @@ public class translucentLauncher extends AppCompatActivity {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCESS_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
+                requestCalledBack = true;
+
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    initializeCruiseService();
                     Log.d("MY", "Permissions granted");
+                    handleIntent();
 
 
                 } else {
-
+                    finish();
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
@@ -79,17 +98,17 @@ public class translucentLauncher extends AppCompatActivity {
         return true;
     }
 
-    protected void checkForPermissions() {
+    protected boolean checkForPermissions() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(translucentLauncher.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_LOCATION);
+            return false;
         } else {
-            initializeCruiseService();
             Log.d("MY", "Permissions already granted");
+            return true;
         }
     }
 
 
-    private final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 2;
+
 
 }

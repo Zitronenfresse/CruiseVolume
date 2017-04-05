@@ -7,5 +7,9 @@
     <string name="onset_speed_and_volume_level">Onset Speed and Volume Level</string>
     <string name="setUpdateIntervalText">Set Update Interval for GPS-Requests</string>
     <string name="banner_ad_unit_id">ca-app-pub-4077367878822895/5226301761</string>
+    <string name="title_activity_settings_menu_tabbed_acitivity">SettingsMenuTabbedAcitivity
+    </string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>

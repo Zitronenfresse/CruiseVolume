@@ -15,12 +15,14 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.media.AudioManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -28,7 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import static com.procrastech.cruisevolume.SettingsActivity.PREFS_NAME;
+import static com.procrastech.cruisevolume.SettingsFragment.PREFS_NAME;
 
 public class CruiseService extends Service implements com.google.android.gms.location.LocationListener,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,SensorEventListener{
     private final myBinder mBinder = new myBinder();
@@ -65,13 +67,13 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     private SensorManager senSensorManager;
     private Sensor senLinearAcceleration;
 
+
     //TODO: Profiles
     //TODO: Translate (at least to german)
     //TODO: Pause-mode when Location is not changing
     //TODO: Awareness API integration
     //TODO: Calculate Speed inbetween updates via Linear Acceleration and correct at update
     //TODO: Initial Wizard
-    //TODO: Option for User Volume Input to disable VolControl
 
 
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -98,7 +100,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
     private void requestQuickLocationUpdates(){
-        if(mConnectedToAPI&&updatingLocation&&accMode&&cachedUpdateInterval==-1&&mUpdateInterval>3000){
+        if(mConnectedToAPI&&updatingLocation&&accMode&&cachedUpdateInterval==-1&&mUpdateInterval>4000){
             cachedUpdateInterval = mUpdateInterval;
             mUpdateInterval = 1;
             quickUpdateCounter = 30;
@@ -164,6 +166,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
                 }
                 stopForeground(true);
                 stopSelf();
+                System.exit(0);
                 break;
             case ACTION_UPDATE_PREFS :
                 Boolean slowgain = intent.getBooleanExtra("slowGainMode",slowGainMode);
@@ -182,6 +185,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
     private void updateParams(boolean slowgain, int startspeed, int endspeed, int startVol, int endVol,int updateInterval,int accelerationThreshold, boolean accMode) {
+        Log.d("MY","Updating");
+
         slowGainMode = slowgain;
         this.accMode = accMode;
         startSpeed = startspeed;
@@ -189,13 +194,19 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         this.startVol = startVol;
         this.endVol = endVol;
         this.accelerationThreshold = accelerationThreshold;
-        if(mConnectedToAPI&&updatingLocation&&mUpdateInterval!=updateInterval){
+
+        if(mUpdateInterval!=updateInterval){
+            if(mConnectedToAPI&&updatingLocation){
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+            }
             mUpdateInterval = updateInterval;
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
-            requestLocationUpdates();
-        }else{
-            mUpdateInterval = updateInterval;
+            cachedUpdateInterval = -1;
+            if(mConnectedToAPI&&updatingLocation){
+                requestLocationUpdates();
+            }
+
         }
+
     }
 
 
@@ -241,7 +252,11 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         mBuilder.setContentTitle("CruiseVolume");
         mBuilder.setSmallIcon(R.drawable.noticon);
         mBuilder.setOngoing(true);
-
+        if( Build.VERSION.SDK_INT < 23){
+            mBuilder.setColor(ContextCompat.getColor(getBaseContext(), R.color.color_not_background));
+        }else{
+            mBuilder.setColor(getResources().getColor(R.color.color_not_background,getTheme()));
+        }
         Intent stopTargetIntent = new Intent(this, CruiseService.class);
         stopTargetIntent.setAction(ACTION_STOP_SERVICE);
         PendingIntent stopIntent = PendingIntent.getService(this, 0, stopTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -259,11 +274,11 @@ public class CruiseService extends Service implements com.google.android.gms.loc
             mBuilder.setContentText("is paused");
         }
         PendingIntent pauseIntent = PendingIntent.getService(this, 0, pauseTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.ic_not_PAUSE,pauseResume,pauseIntent);
+        mBuilder.addAction(R.drawable.ic_not_pause,pauseResume,pauseIntent);
 
-        Intent settingsTargetIntent = new Intent(this, SettingsActivity.class);
-        PendingIntent settingsIntent = PendingIntent.getActivity(this, 0, settingsTargetIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.ic_not_settings,"Settings",settingsIntent);
+        Intent tabsettingsTargetIntent = new Intent(this, tabSettingsActivity.class);
+        PendingIntent tabsettingsIntent = PendingIntent.getActivity(this, 0, tabsettingsTargetIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.addAction(R.drawable.ic_one,"Settings",tabsettingsIntent);
 
         mBuilder.setPriority(Notification.PRIORITY_MAX);
         return mBuilder.build();
@@ -385,13 +400,17 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
     private void incrementVol() {
-        if(curVol<goalVol){
-            curVol++;
-        }else{
-            if(curVol>goalVol){
-                curVol--;
+        if (initVol != -1) {
+            if(curVol<goalVol){
+                curVol++;
+            }else{
+                if(curVol>goalVol){
+                    curVol--;
+                }
             }
+
         }
+
     }
 
     private void updateVolume() {

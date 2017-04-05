@@ -1,30 +1,26 @@
 package com.procrastech.cruisevolume;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
-
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
-import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.AttributeSet;
-import android.util.Log;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Switch;
-import android.widget.TabHost;
 import android.widget.TextView;
 
-public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener, Switch.OnCheckedChangeListener  {
 
-    private AdView mAdView;
-    private static final String TAG = "SettingsActivity";
+/**
+ * Created by IEnteramine on 04.04.2017.
+ */
+
+public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, Switch.OnCheckedChangeListener{
+
 
 
     SeekBar speedBarOne;
@@ -57,41 +53,63 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
 
     public static final String PREFS_NAME = "CruisePrefsFile";
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_settings, null);
+        getAllWidgets(view);
+
+        return view;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-
-
-        initAds();
         restorePreferences();
-        initializeUI();
-
 
     }
 
-    @Override
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrset){
-        return super.onCreateView(parent,name,context,attrset);
+    private void getAllWidgets(View view) {
+        rotatingLogoView = (ImageView) view.findViewById(R.id.rotatingLogoView);
+        rotatingLogoAnimation = (AnimationDrawable) rotatingLogoView.getDrawable();
+        rotatingLogoAnimation.start();
+        thrBar = (SeekBar) view.findViewById(R.id.seekThreshold);
+        thrText = (TextView) view.findViewById(R.id.textThreshold);
+        accModeSwitch = (Switch) view.findViewById(R.id.switchAccMode);
+        speedBarOne = (SeekBar) view.findViewById(R.id.seekSpeedThrOne);
+        speedTextOne = (TextView) view.findViewById(R.id.textSpeedThrOne);
+        volBarOne = (SeekBar) view.findViewById(R.id.seekVolThrOne);
+        volTextOne = (TextView) view.findViewById(R.id.textVolThrOne);
+        speedBarTwo = (SeekBar) view.findViewById(R.id.seekSpeedThrTwo);
+        speedTextTwo = (TextView) view.findViewById(R.id.textSpeedThrTwo);
+        volBarTwo = (SeekBar) view.findViewById(R.id.seekVolThrTwo);
+        volTextTwo = (TextView) view.findViewById(R.id.textVolThrTwo);
+        slowGainModeSwitch = (Switch) view.findViewById(R.id.switchSlowGainMode);
+        updateIntervalBar = (SeekBar) view.findViewById(R.id.seekUpdateInterval);
+        updateIntervalText = (TextView) view.findViewById(R.id.textUpdateInterval);
+        speedBarOne.setOnSeekBarChangeListener(this);
+        speedBarTwo.setOnSeekBarChangeListener(this);
+        volBarOne.setOnSeekBarChangeListener(this);
+        volBarTwo.setOnSeekBarChangeListener(this);
+        updateIntervalBar.setOnSeekBarChangeListener(this);
+        thrBar.setOnSeekBarChangeListener(this);
+        slowGainModeSwitch.setOnCheckedChangeListener(this);
+        slowGainModeSwitch.setChecked(mSlowGainMode);
+        accModeSwitch.setOnCheckedChangeListener(this);
+        accModeSwitch.setChecked(accMode);
+        speedBarOne.setMax(100);
+        speedBarTwo.setMax(100);
 
+        thrBar.setProgress(accelerationThresholdProg);
+        updateIntervalBar.setProgress(mUpdateIntervalProg);
+        speedBarOne.setProgress(mSpeedSetOne);
+        speedBarTwo.setProgress(mSpeedSetTwo);
+        volBarOne.setProgress(mVolSetOne);
+        volBarTwo.setProgress(mVolSetTwo);
     }
-
-
-
-    private void initAds() {
-        MobileAds.initialize(getApplicationContext(), "ca-app-pub-4077367878822895~3749568563");
-
-        mAdView = (AdView) findViewById(R.id.adView);
-
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).addTestDevice("B285B4A48DCD75D67F18B862A24B5AFD").build();
-        mAdView.loadAd(adRequest);
-    }
-
-
 
     private void restorePreferences() {
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
         mSlowGainMode = settings.getBoolean("slowGainMode", true);
         mVolSetOne = settings.getInt("volSetOne",5);
         mVolSetTwo = settings.getInt("volSetTwo",10);
@@ -106,9 +124,8 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
 
 
     }
-
     private void savePreferences() {
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("slowGainMode", mSlowGainMode);
         editor.putInt("volSetOne", mVolSetOne);
@@ -123,50 +140,6 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         editor.apply();
     }
 
-    private void initializeUI() {
-        rotatingLogoView = (ImageView) findViewById(R.id.rotatingLogoView);
-        rotatingLogoAnimation = (AnimationDrawable) rotatingLogoView.getDrawable();
-        rotatingLogoAnimation.start();
-
-
-        thrBar = (SeekBar) findViewById(R.id.seekThreshold);
-        thrText = (TextView) findViewById(R.id.textThreshold);
-        accModeSwitch = (Switch) findViewById(R.id.switchAccMode);
-        speedBarOne = (SeekBar) findViewById(R.id.seekSpeedThrOne);
-        speedTextOne = (TextView) findViewById(R.id.textSpeedThrOne);
-        volBarOne = (SeekBar) findViewById(R.id.seekVolThrOne);
-        volTextOne = (TextView) findViewById(R.id.textVolThrOne);
-        speedBarTwo = (SeekBar) findViewById(R.id.seekSpeedThrTwo);
-        speedTextTwo = (TextView) findViewById(R.id.textSpeedThrTwo);
-        volBarTwo = (SeekBar) findViewById(R.id.seekVolThrTwo);
-        volTextTwo = (TextView) findViewById(R.id.textVolThrTwo);
-        slowGainModeSwitch = (Switch) findViewById(R.id.switchSlowGainMode);
-        updateIntervalBar = (SeekBar) findViewById(R.id.seekUpdateInterval);
-        updateIntervalText = (TextView) findViewById(R.id.textUpdateInterval);
-        speedBarOne.setOnSeekBarChangeListener(this);
-        speedBarTwo.setOnSeekBarChangeListener(this);
-        volBarOne.setOnSeekBarChangeListener(this);
-        volBarTwo.setOnSeekBarChangeListener(this);
-        updateIntervalBar.setOnSeekBarChangeListener(this);
-        thrBar.setOnSeekBarChangeListener(this);
-        slowGainModeSwitch.setOnCheckedChangeListener(this);
-        slowGainModeSwitch.setChecked(mSlowGainMode);
-        accModeSwitch.setOnCheckedChangeListener(this);
-        accModeSwitch.setChecked(accMode);
-        speedBarOne.setMax(100);
-        speedBarTwo.setMax(100);
-
-
-
-        thrBar.setProgress(accelerationThresholdProg);
-        updateIntervalBar.setProgress(mUpdateIntervalProg);
-        speedBarOne.setProgress(mSpeedSetOne);
-        speedBarTwo.setProgress(mSpeedSetTwo);
-        volBarOne.setProgress(mVolSetOne);
-        volBarTwo.setProgress(mVolSetTwo);
-
-    }
-
     public void updateUI(){
 
 
@@ -179,16 +152,6 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
 
 
     }
-
-
-
-    public void onWindowFocusChanged(boolean hasFocus){
-        super.onWindowFocusChanged(hasFocus);
-        rotatingLogoAnimation.start();
-
-
-    }
-
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         switch(seekBar.getId()){
@@ -231,9 +194,8 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
 
 
     }
-
     private void updateParams(){
-        Intent startServiceIntent = new Intent(this,CruiseService.class);
+        Intent startServiceIntent = new Intent(this.getContext(),CruiseService.class);
         startServiceIntent.setAction(CruiseService.ACTION_UPDATE_PREFS);
         startServiceIntent.putExtra("accMode",accMode);
         startServiceIntent.putExtra("slowGainMode",mSlowGainMode);
@@ -243,20 +205,17 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         startServiceIntent.putExtra("endVol",mVolSetTwo);
         startServiceIntent.putExtra("mUpdateInterval",mUpdateInterval);
         startServiceIntent.putExtra("accelerationThreshold",accelerationThreshold);
-        startService(startServiceIntent);
+        getActivity().startService(startServiceIntent);
+
     }
-
-
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
 
     }
-
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
     }
-
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()){
@@ -269,29 +228,14 @@ public class SettingsActivity extends AppCompatActivity implements SeekBar.OnSee
         }
         updateParams();
     }
-
     @Override
     public void onPause() {
-        if (mAdView != null) {
-            mAdView.pause();
-        }
+
         savePreferences();
         super.onPause();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mAdView != null) {
-            mAdView.resume();
-        }
-    }
 
-    @Override
-    public void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
-        super.onDestroy();
-    }
+
+
 }

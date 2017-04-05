@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.procrastech.cruisevolume.SettingsActivity">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.61">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.61"
+                android:text="@string/onset_speed_and_volume_level" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.61"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textSpeedThrOne"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5" />
+
+                <SeekBar
+                    android:id="@+id/seekSpeedThrOne"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/VolLinOne"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.61"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textVolThrOne"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5" />
+
+                <SeekBar
+                    android:id="@+id/seekVolThrOne"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:max="15"
+                    android:progress="3" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.61"
+                android:text="@string/final_speed_and_volume_level" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.61"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textSpeedThrTwo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5" />
+
+                <SeekBar
+                    android:id="@+id/seekSpeedThrTwo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.61"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textVolThrTwo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5" />
+
+                <SeekBar
+                    android:id="@+id/seekVolThrTwo"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:max="15"
+                    android:progress="3" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.61"
+                android:text="Set Threshold for Acceleration Sensor" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.61"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textThreshold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5" />
+
+                <SeekBar
+                    android:id="@+id/seekThreshold"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:max="15"
+                    android:progress="2" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textSetUpdateInterval"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.61"
+                android:text="@string/setUpdateIntervalText" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.61"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textUpdateInterval"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5" />
+
+                <SeekBar
+                    android:id="@+id/seekUpdateInterval"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:max="15"
+                    android:progress="1" />
+
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/switchAccMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.61"
+                android:text="Listen to linear Acceleration" />
+
+            <Switch
+                android:id="@+id/switchSlowGainMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.61"
+                android:text="@string/incAdjSwitchText" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.61"
+                android:text="@string/disclaimerText"
+                tools:layout_editor_absoluteX="8dp"
+                tools:layout_editor_absoluteY="0dp" />
+
+            <ImageView
+                android:id="@+id/rotatingLogoView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.61"
+                app:srcCompat="@drawable/rotatinglogo" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
