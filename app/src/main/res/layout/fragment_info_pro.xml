@@ -65,13 +65,6 @@
                 android:layout_height="50dp"
                 android:layout_weight="1" />
 
-            <Button
-                android:id="@+id/buyButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="buyClick"
-                android:text="@string/buy_pro" />
         </LinearLayout>
     </ScrollView>
 

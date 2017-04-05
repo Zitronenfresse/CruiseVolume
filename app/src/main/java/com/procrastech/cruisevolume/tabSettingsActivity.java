@@ -1,23 +1,31 @@
 package com.procrastech.cruisevolume;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.procrastech.cruisevolume.util.IabHelper;
+import com.procrastech.cruisevolume.util.IabResult;
+import com.procrastech.cruisevolume.util.Inventory;
+import com.procrastech.cruisevolume.util.Purchase;
+
+import static com.procrastech.cruisevolume.SettingsFragment.PREFS_NAME;
 
 public class tabSettingsActivity extends AppCompatActivity {
 
-    public static tabSettingsActivity instance;
     private ViewPagerAdapter adapter;
     private SettingsFragment mSettingsFragment;
     private ProfilesFragment mProfilesFragment;
@@ -25,17 +33,27 @@ public class tabSettingsActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private TabLayout allTabs;
 
-    private boolean proVersion = false;
+    protected static boolean proVersion;
 
     private AdView mAdView;
 
     private String POSITION;
-    private static final String TAG = "SettingsActivity";
+
+    private static final String KEY_PREF_PURCHASE_PROVERSION_AVAILABLE = "KEY_PREF_PURCHASE_PROVERSION_AVAILABLE";
+    private static final String TAG = "tabSettings";
+    static final String ITEM_SKU = "proversion";
+
+    private Button buyButton;
+    IabHelper mHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String encodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArXjuny14c2ZLblnB7cPO0zCG2xr0SVIOwkDEH28lnangmNNtP3/+q0ecDnoiGQITp9XKtTwSn69G/Dz+U4MPBE2g25a3JFeADc0H3yd30meUmWSHOv2Pmtg09iTwc9Ct3elpIQilCv1ker67Dei4l5Buy5mNT4y2xUSwy0mJQpecZWGaXmDX5Zc3wE3MCBgQbYhD6hCw3GZYzKlEdfbbJSzvZh28+uHnag6YdRaS3OqZmFfj4Cc5bmKD7kgbIZ7G0AUfETy4d2/5bdpcQ1Nk6j4stHN7eYqChItWTTH7ccJjOlp5zaQQMBIzwe4+8pptcOaR6Misd60cLQEs2Hdp6wIDAQAB";
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        proVersion = !settings.getBoolean(KEY_PREF_PURCHASE_PROVERSION_AVAILABLE,true);
+
         if(proVersion){
             setContentView(R.layout.activity_tab_settings_pro);
 
@@ -44,7 +62,8 @@ public class tabSettingsActivity extends AppCompatActivity {
             initAds();
 
         }
-        instance=this;
+
+        buyButton = (Button)findViewById(R.id.buyButton);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         allTabs = (TabLayout) findViewById(R.id.tabs);
@@ -58,9 +77,101 @@ public class tabSettingsActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         allTabs.setupWithViewPager(viewPager);
 
+        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArXjuny14c2ZLblnB7cPO0zCG2xr0SVIOwkDEH28lnangmNNtP3/+q0ecDnoiGQITp9XKtTwSn69G/Dz+U4MPBE2g25a3JFeADc0H3yd30meUmWSHOv2Pmtg09iTwc9Ct3elpIQilCv1ker67Dei4l5Buy5mNT4y2xUSwy0mJQpecZWGaXmDX5Zc3wE3MCBgQbYhD6hCw3GZYzKlEdfbbJSzvZh28+uHnag6YdRaS3OqZmFfj4Cc5bmKD7kgbIZ7G0AUfETy4d2/5bdpcQ1Nk6j4stHN7eYqChItWTTH7ccJjOlp5zaQQMBIzwe4+8pptcOaR6Misd60cLQEs2Hdp6wIDAQAB";
+
+        mHelper = new IabHelper(this, base64EncodedPublicKey);
+
+        mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            public void onIabSetupFinished(IabResult result)
+            {
+                if (!result.isSuccess()) {
+                    Log.d(TAG, "In-app Billing setup failed: " +
+                            result);
+                } else {
+                    mHelper.queryInventoryAsync(mReceivedInventoryListener);
+                    Log.d(TAG, "In-app Billing is set up OK");
+                }
+            }
+        });
 
 
 
+}
+
+    IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener
+            = new IabHelper.OnIabPurchaseFinishedListener() {
+        public void onIabPurchaseFinished(IabResult result,
+                                          Purchase purchase)
+        {
+            if (result.isFailure()) {
+                // Handle error
+                return;
+            }
+            else if (purchase.getSku().equals(ITEM_SKU)) {
+                consumeItem();
+            }
+
+        }
+    };
+
+    public void consumeItem() {
+        mHelper.queryInventoryAsync(mReceivedInventoryListener);
+    }
+
+    IabHelper.QueryInventoryFinishedListener mReceivedInventoryListener
+            = new IabHelper.QueryInventoryFinishedListener() {
+        public void onQueryInventoryFinished(IabResult result,
+                                             Inventory inventory) {
+
+            if (result.isFailure()) {
+                // Handle failure
+            } else {
+                boolean hasPurchased_PROVERSION = inventory.hasPurchase(ITEM_SKU);
+                SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, 0);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                boolean toRecreate = false;
+                if(sharedPref.getBoolean(KEY_PREF_PURCHASE_PROVERSION_AVAILABLE,true) && hasPurchased_PROVERSION){
+                    setContentView(R.layout.activity_tab_settings_pro);
+                    toRecreate = true;
+                }
+                Log.d("IAB","InventoryQueryfinsihed, user has pro: " + hasPurchased_PROVERSION);
+                editor.putBoolean(KEY_PREF_PURCHASE_PROVERSION_AVAILABLE, !hasPurchased_PROVERSION);
+                editor.commit();
+
+                if(toRecreate){
+                    recreate();
+                }
+
+            }
+        }
+    };
+
+    IabHelper.OnConsumeFinishedListener mConsumeFinishedListener =
+            new IabHelper.OnConsumeFinishedListener() {
+                public void onConsumeFinished(Purchase purchase,
+                                              IabResult result) {
+
+                    if (result.isSuccess()) {
+                        proVersion = true;
+                    } else {
+                        // handle error
+                    }
+                }
+            };
+
+    public void buyClick(View view) {
+        mHelper.launchPurchaseFlow(this, ITEM_SKU, 10001,
+                mPurchaseFinishedListener, "mypurchasetoken");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data)
+    {
+        if (!mHelper.handleActivityResult(requestCode,
+                resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     public void onSendFeebackButton(View view){
@@ -100,9 +211,6 @@ public class tabSettingsActivity extends AppCompatActivity {
         }
     }
 
-    public static tabSettingsActivity getInstance() {
-        return instance;
-    }
 
 
     @Override
@@ -147,6 +255,10 @@ public class tabSettingsActivity extends AppCompatActivity {
             mAdView.destroy();
         }
         super.onDestroy();
+        if (mHelper != null){
+            mHelper.dispose();
+        }
+        mHelper = null;
     }
 
 }
