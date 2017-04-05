@@ -25,16 +25,25 @@ public class translucentLauncher extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        action = "";
-        if(intent.getAction()!=null){
-            action = intent.getAction();
+        if (intent.hasExtra("news_only")) {
+            finish();
+        }
+        if (intent.hasExtra("click_action")) {
+            ClickActionHelper.startActivity(intent.getStringExtra("click_action"), intent.getExtras(), this);
+            finish();
+        }else{
+            action = "";
+            if(intent.getAction()!=null){
+                action = intent.getAction();
+            }
+
+            if(checkPlayServices()){
+                if(checkForPermissions()){
+                    handleIntent();
+                };
+            }
         }
 
-        if(checkPlayServices()){
-            if(checkForPermissions()){
-                handleIntent();
-            };
-        }
 
 
 
@@ -45,6 +54,9 @@ public class translucentLauncher extends AppCompatActivity {
 
     private void handleIntent(){
         Log.d("Intent", "Intentaction is "+action+".");
+
+
+
 
         switch (action){
             case "" :

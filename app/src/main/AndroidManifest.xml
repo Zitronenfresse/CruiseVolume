@@ -54,8 +54,16 @@
             </intent-filter>
         </service>
 
+        <service android:name=".MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".tabSettingsActivity" />
+        <activity android:name=".tabSettingsActivity"
+            android:launchMode="singleTop"
+            />
     </application>
 
 </manifest>
