@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,10 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_ACTIVE_PROFILE_NUMBER;
+import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_MODE_PREFS;
+import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_PROFILE_PREFS;
 
 
 /**
@@ -51,13 +56,28 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
     ImageView rotatingLogoView;
     AnimationDrawable rotatingLogoAnimation;
 
-    public static final String PREFS_NAME = "CruisePrefsFile";
+    SharedPreferences mode_prefs;
+    SharedPreferences profile_prefs;
+
+    SharedPreferences profile_prefs1;
+    SharedPreferences profile_prefs2;
+    SharedPreferences profile_prefs3;
+    SharedPreferences profile_prefs4;
+    SharedPreferences profile_prefs5;
+
+
+    SharedPreferences.OnSharedPreferenceChangeListener mode_changed_listener;
+
+    private int active_profile_number;
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, null);
         getAllWidgets(view);
+        initSharedPreferences();
 
         return view;
     }
@@ -65,7 +85,6 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        restorePreferences();
 
     }
 
@@ -108,50 +127,90 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
         volBarTwo.setProgress(mVolSetTwo);
     }
 
-    private void restorePreferences() {
-        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
-        mSlowGainMode = settings.getBoolean("slowGainMode", true);
-        mVolSetOne = settings.getInt("volSetOne",5);
-        mVolSetTwo = settings.getInt("volSetTwo",10);
-        mSpeedSetOne = settings.getInt("speedSetOne",50);
-        mSpeedSetTwo = settings.getInt("speedSetTwo", 99);
-        mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
-        mUpdateInterval = settings.getInt("updateInterval",1000);
-        mUpdateIntervalProg = settings.getInt("updateIntervalProg",1);
-        accelerationThreshold = settings.getInt("accelerationThreshold",5);
-        accelerationThresholdProg = settings.getInt("accelerationThresholdProg",10);
-        accMode = settings.getBoolean("accMode",false);
+    private void initSharedPreferences(){
+
+        profile_prefs1 = getActivity().getSharedPreferences(KEY_PROFILE_PREFS+1,0);
+        profile_prefs2 = getActivity().getSharedPreferences(KEY_PROFILE_PREFS+2,0);
+        profile_prefs3 = getActivity().getSharedPreferences(KEY_PROFILE_PREFS+3,0);
+        profile_prefs4 = getActivity().getSharedPreferences(KEY_PROFILE_PREFS+4,0);
+        profile_prefs5 = getActivity().getSharedPreferences(KEY_PROFILE_PREFS+5,0);
 
 
+        mode_changed_listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                active_profile_number = sharedPreferences.getInt(KEY_ACTIVE_PROFILE_NUMBER,1);
+                profile_prefs = getActivity().getSharedPreferences(KEY_PROFILE_PREFS+active_profile_number,0);
+                Log.d("PREF",KEY_PROFILE_PREFS+active_profile_number+" loaded");
+                loadProfilePreferences();
+            }
+        };
+
+        mode_prefs = getActivity().getSharedPreferences(KEY_MODE_PREFS,0);
+        active_profile_number = mode_prefs.getInt(KEY_ACTIVE_PROFILE_NUMBER,1);
+        mode_prefs.registerOnSharedPreferenceChangeListener(mode_changed_listener);
+
+        profile_prefs = getActivity().getSharedPreferences(KEY_PROFILE_PREFS+active_profile_number,0);
+        loadProfilePreferences();
     }
-    private void savePreferences() {
-        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("slowGainMode", mSlowGainMode);
-        editor.putInt("volSetOne", mVolSetOne);
-        editor.putInt("volSetTwo", mVolSetTwo);
-        editor.putInt("speedSetOne", mSpeedSetOne);
-        editor.putInt("speedSetTwo", mSpeedSetTwo);
-        editor.putInt("updateInterval",mUpdateInterval);
-        editor.putInt("updateIntervalProg",mUpdateIntervalProg);
-        editor.putInt("accelerationThreshold",accelerationThreshold);
-        editor.putInt("accelerationThresholdProg",accelerationThresholdProg);
-        editor.putBoolean("accMode",accMode);
-        editor.apply();
+
+    private void loadProfilePreferences() {
+        mSlowGainMode = profile_prefs.getBoolean("slowGainMode", true);
+        mVolSetOne = profile_prefs.getInt("volSetOne",5);
+        mVolSetTwo = profile_prefs.getInt("volSetTwo",10);
+        mSpeedSetOne = profile_prefs.getInt("speedSetOne",50);
+        mSpeedSetTwo = profile_prefs.getInt("speedSetTwo", 99);
+        mSpeedSetTwoTotal = mSpeedSetOne + mSpeedSetTwo;
+        mUpdateInterval = profile_prefs.getInt("updateInterval",1000);
+        mUpdateIntervalProg = profile_prefs.getInt("updateIntervalProg",1);
+        accelerationThreshold = profile_prefs.getInt("accelerationThreshold",5);
+        accelerationThresholdProg = profile_prefs.getInt("accelerationThresholdProg",10);
+        accMode = profile_prefs.getBoolean("accMode",false);
+        updateUIAfterProfileChange();
+    }
+
+    private void saveProfilePreferences(){
+        if(profile_prefs!=null){
+            SharedPreferences.Editor editor = profile_prefs.edit();
+            editor.putBoolean("slowGainMode", mSlowGainMode);
+            editor.putInt("volSetOne", mVolSetOne);
+            editor.putInt("volSetTwo", mVolSetTwo);
+            editor.putInt("speedSetOne", mSpeedSetOne);
+            editor.putInt("speedSetTwo", mSpeedSetTwo);
+            editor.putInt("updateInterval",mUpdateInterval);
+            editor.putInt("updateIntervalProg",mUpdateIntervalProg);
+            editor.putInt("accelerationThreshold",accelerationThreshold);
+            editor.putInt("accelerationThresholdProg",accelerationThresholdProg);
+            editor.putBoolean("accMode",accMode);
+            editor.apply();
+        }
+
     }
 
     public void updateUI(){
-
-
         speedTextOne.setText(mSpeedSetOne +" km/h");
         speedTextTwo.setText(mSpeedSetTwoTotal +" km/h");
         updateIntervalText.setText(mUpdateInterval+ " ms");
         volTextOne.setText(mVolSetOne+"");
         volTextTwo.setText(mVolSetTwo+"");
         thrText.setText(accelerationThreshold+"");
-
+        slowGainModeSwitch.setChecked(mSlowGainMode);
 
     }
+
+    private void updateUIAfterProfileChange(){
+        updateUI();
+        thrBar.setProgress(accelerationThresholdProg);
+        updateIntervalBar.setProgress(mUpdateIntervalProg);
+        speedBarOne.setProgress(mSpeedSetOne);
+        speedBarTwo.setProgress(mSpeedSetTwo);
+        volBarOne.setProgress(mVolSetOne);
+        volBarTwo.setProgress(mVolSetTwo);
+        accModeSwitch.setChecked(accMode);
+
+    }
+
+
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         switch(seekBar.getId()){
@@ -190,24 +249,11 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
             mUpdateInterval = mUpdateIntervalProg*1000;
         }
         updateUI();
-        updateParams();
+        saveProfilePreferences();
 
 
     }
-    private void updateParams(){
-        Intent startServiceIntent = new Intent(this.getContext(),CruiseService.class);
-        startServiceIntent.setAction(CruiseService.ACTION_UPDATE_PREFS);
-        startServiceIntent.putExtra("accMode",accMode);
-        startServiceIntent.putExtra("slowGainMode",mSlowGainMode);
-        startServiceIntent.putExtra("startSpeed",mSpeedSetOne);
-        startServiceIntent.putExtra("endSpeed",mSpeedSetTwoTotal);
-        startServiceIntent.putExtra("startVol",mVolSetOne);
-        startServiceIntent.putExtra("endVol",mVolSetTwo);
-        startServiceIntent.putExtra("mUpdateInterval",mUpdateInterval);
-        startServiceIntent.putExtra("accelerationThreshold",accelerationThreshold);
-        getActivity().startService(startServiceIntent);
 
-    }
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
 
@@ -226,13 +272,17 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
                 accMode = isChecked;
                 break;
         }
-        updateParams();
+        saveProfilePreferences();
     }
     @Override
     public void onPause() {
-
-        savePreferences();
         super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        mode_prefs.unregisterOnSharedPreferenceChangeListener(mode_changed_listener);
+        super.onDestroy();
     }
 
 

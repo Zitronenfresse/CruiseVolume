@@ -30,10 +30,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import static com.procrastech.cruisevolume.SettingsFragment.PREFS_NAME;
+import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_ACTIVE_PROFILE_NUMBER;
+import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_MODE_PREFS;
+import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_PROFILE_PREFS;
 
 public class CruiseService extends Service implements com.google.android.gms.location.LocationListener,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,SensorEventListener{
-    private final myBinder mBinder = new myBinder();
+
     AudioManager mAudioManager;
     LocationRequest mLocationRequest;
     private double mSpeed;
@@ -62,17 +64,24 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public static final String ACTION_UPDATE_PREFS = "com.procrastech.cruisevolume.ACTION_UPDATE_PREFS";
     private boolean startLocationUpdatesOnAPIConnected = false;
 
+
+    SharedPreferences mode_prefs;
+    SharedPreferences profile_prefs;
+    private int active_profile_number;
+
+    SharedPreferences.OnSharedPreferenceChangeListener profile_changed_listener;
+    SharedPreferences.OnSharedPreferenceChangeListener mode_changed_listener;
+
     private int accelerationThreshold = 5;
 
     private SensorManager senSensorManager;
     private Sensor senLinearAcceleration;
 
 
-    //TODO: Profiles
     //TODO: Translate (at least to german)
-    //TODO: Pause-mode when Location is not changing
-    //TODO: Awareness API integration
-    //TODO: Calculate Speed inbetween updates via Linear Acceleration and correct at update
+    //TODO: Pause-mode when Location is not changing - NOT IMPORTANT
+    //TODO: Awareness API integration- NOT IMPORTANT
+    //TODO: Calculate Speed inbetween updates via Linear Acceleration and correct at update- NOT IMPORTANT BUT COOL
     //TODO: Initial Wizard
 
 
@@ -122,18 +131,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         return START_REDELIVER_INTENT;
     }
 
-    private void restorePreferences() {
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        slowGainMode = settings.getBoolean("slowGainMode", true);
-        startVol = settings.getInt("volSetOne",5);
-        endVol = settings.getInt("volSetTwo",10);
-        startSpeed = settings.getInt("speedSetOne",50);
-        endSpeed = settings.getInt("speedSetTwo", 99) + startSpeed;
-        mUpdateInterval = settings.getInt("updateInterval",1000);
-        accelerationThreshold = settings.getInt("accelerationThreshold",10);
-        accMode = settings.getBoolean("accMode",false);
-
-    }
 
     private void handleIntent(Intent intent) {
         String action = "";
@@ -231,13 +228,54 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public void onCreate(){
         super.onCreate();
 
-        restorePreferences();
+        initSharedPreferences();
+
+
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         createLocationRequest();
         createGoogleAPIClient();
         mGoogleApiClient.connect();
         initAccSensor();
+    }
+
+    private void initSharedPreferences(){
+        mode_changed_listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                active_profile_number = sharedPreferences.getInt(KEY_ACTIVE_PROFILE_NUMBER,1);
+                profile_prefs.unregisterOnSharedPreferenceChangeListener(profile_changed_listener);
+                profile_prefs = getSharedPreferences(KEY_PROFILE_PREFS+active_profile_number,0);
+                profile_prefs.registerOnSharedPreferenceChangeListener(profile_changed_listener);
+            }
+        };
+
+        profile_changed_listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                loadProfilePreferences();
+            }
+        };
+
+
+        mode_prefs = getSharedPreferences(KEY_MODE_PREFS,0);
+        active_profile_number = mode_prefs.getInt(KEY_ACTIVE_PROFILE_NUMBER,1);
+        mode_prefs.registerOnSharedPreferenceChangeListener(mode_changed_listener);
+
+        profile_prefs = getSharedPreferences(KEY_PROFILE_PREFS+active_profile_number,0);
+        profile_prefs.registerOnSharedPreferenceChangeListener(profile_changed_listener);
+        loadProfilePreferences();
+    }
+
+    private void loadProfilePreferences() {
+        slowGainMode = profile_prefs.getBoolean("slowGainMode", true);
+        startVol = profile_prefs.getInt("volSetOne",5);
+        endVol = profile_prefs.getInt("volSetTwo",10);
+        startSpeed = profile_prefs.getInt("speedSetOne",50);
+        endSpeed = profile_prefs.getInt("speedSetTwo", 99) + startSpeed;
+        mUpdateInterval = profile_prefs.getInt("updateInterval",1000);
+        accelerationThreshold = profile_prefs.getInt("accelerationThreshold",10);
+        accMode = profile_prefs.getBoolean("accMode",false);
     }
 
     private void initAccSensor() {
@@ -284,12 +322,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         return mBuilder.build();
     }
 
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
 
     private void createLocationRequest() {
         mLocationRequest = LocationRequest.create();
@@ -389,14 +421,22 @@ public class CruiseService extends Service implements com.google.android.gms.loc
                 }
             }
 
-            //TODO: Move updateVolume to own handler with adjustable update-frequency
+            //TODO: Move updateVolume to own handler with adjustable update-frequency - IMPORTANT
             updateVolume();
         }
     }
 
     @Override public void onDestroy(){
         cancelNotifications();
+        mode_prefs.unregisterOnSharedPreferenceChangeListener(mode_changed_listener);
+        profile_prefs.unregisterOnSharedPreferenceChangeListener(profile_changed_listener);
         super.onDestroy();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     private void incrementVol() {
@@ -475,14 +515,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
 
-
-    class myBinder extends Binder {
-        //TODO: Use Binder as Interface
-
-        CruiseService getService(){
-            return CruiseService.this;
-        }
-    }
 
 
 }

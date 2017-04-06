@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
@@ -22,7 +21,6 @@ import com.procrastech.cruisevolume.util.IabResult;
 import com.procrastech.cruisevolume.util.Inventory;
 import com.procrastech.cruisevolume.util.Purchase;
 
-import static com.procrastech.cruisevolume.SettingsFragment.PREFS_NAME;
 
 public class tabSettingsActivity extends AppCompatActivity {
 
@@ -34,6 +32,14 @@ public class tabSettingsActivity extends AppCompatActivity {
     private TabLayout allTabs;
 
     protected static boolean proVersion;
+
+
+    protected static final String KEY_PROFILE = "KEY_PROFILE";
+
+
+    protected static final String KEY_ACTIVE_PROFILE_NUMBER = "KEY_ACTIVE_PROFILE_NUMBER";
+    protected static final String KEY_MODE_PREFS = "KEY_MODE_PREFS";
+    protected static final String KEY_PROFILE_PREFS = "KEY_PROFILE_PREFS";
 
     private AdView mAdView;
 
@@ -50,9 +56,14 @@ public class tabSettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+
+
+
+        SharedPreferences settings = getSharedPreferences(KEY_MODE_PREFS, 0);
 
         proVersion = !settings.getBoolean(KEY_PREF_PURCHASE_PROVERSION_AVAILABLE,true);
+
 
         if(proVersion){
             setContentView(R.layout.activity_tab_settings_pro);
@@ -96,7 +107,8 @@ public class tabSettingsActivity extends AppCompatActivity {
 
 
 
-}
+    }
+
 
     IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener
             = new IabHelper.OnIabPurchaseFinishedListener() {
@@ -127,7 +139,7 @@ public class tabSettingsActivity extends AppCompatActivity {
                 // Handle failure
             } else {
                 boolean hasPurchased_PROVERSION = inventory.hasPurchase(ITEM_SKU);
-                SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, 0);
+                SharedPreferences sharedPref = getSharedPreferences(KEY_MODE_PREFS, 0);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 boolean toRecreate = false;
                 if(sharedPref.getBoolean(KEY_PREF_PURCHASE_PROVERSION_AVAILABLE,true) && hasPurchased_PROVERSION){
@@ -210,8 +222,6 @@ public class tabSettingsActivity extends AppCompatActivity {
             Toast.makeText(this,"There is no email client installed.", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
