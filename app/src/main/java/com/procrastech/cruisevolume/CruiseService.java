@@ -56,7 +56,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     protected int endVol;
     protected int goalVol;
     protected int curVol;
-    protected int initVol = -1;
     NotificationManager mNotificationManager;
     protected static boolean updatingLocation;
     protected int[] boundarr;
@@ -140,7 +139,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         return START_REDELIVER_INTENT;
     }
 
-
     private void handleIntent(Intent intent) {
         String action = "";
         if(intent.getAction()!=null){
@@ -178,8 +176,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         }
     }
 
-
-
     protected void createBoundaries(){
         int number = endVol - startVol;
         boundarr = new int[number+1];
@@ -200,8 +196,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     @Override
     public void onCreate(){
         super.onCreate();
-
-
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         createLocationRequest();
@@ -353,9 +347,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
         handler = new Handler();
         handler.postDelayed(runnableVolAdjuster, mVolumeUpdateDelay);
-        if (initVol == -1) {
-            initVol = curVol;
-        }
+
         requestLocationUpdates();
         Log.d("LOCATION", "Starting Location updates");
         updatingLocation = true;
@@ -365,13 +357,9 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     }
 
-
     protected void stopLocationUpdates(){
 
-        if(initVol!=-1){
-            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,initVol,0);
-            initVol = -1;
-        }
+
 
         handler.removeCallbacks(runnableVolAdjuster);
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
@@ -386,7 +374,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         Log.d("PREF",active_profile_number+" active profile number");
 
         if(cachedUpdateInterval!=-1){
-            if(quickUpdateCounter > 0){d 
+            if(quickUpdateCounter > 0){
                 quickUpdateCounter--;
             }else{
                 mUpdateInterval = cachedUpdateInterval;
@@ -405,18 +393,18 @@ public class CruiseService extends Service implements com.google.android.gms.loc
             //Log.d("CONTROL", "VOL CONTROL Cycle with speed "+speed+" :");
             curVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 
+            if(speed>=boundarr[0]){
 
 
-            for(int i = boundarr.length-1; i >= 0;i--){
-                if(speed < boundarr[i]){
-                    continue;
+                for(int i = boundarr.length-1; i >= 0;i--){
+                    if(speed < boundarr[i]){
+                        continue;
+                    }
+                    setVolume(volarr[i]);
+                    Log.d("CONTROL", "VOL CONTROL set Goal Volume to "+ volarr[i]+" at " +speed+"km/h");
+                    break;
                 }
-                setVolume(volarr[i]);
-                //Log.d("CONTROL", "VOL CONTROL set Goal Volume to "+ volarr[i]+" at " +speed+"km/h");
-                break;
             }
-
-
         }
     }
 
@@ -448,14 +436,17 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
     private void updateVolume() {
-        if(slowGainMode){
-            incrementVol();
-        }
-        if(curVol!=goalVol){
+        if(boundarr[0]<=mSpeed){
+            if(slowGainMode){
+                incrementVol();
+            }
+
             mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,curVol,0);
             Log.d("CONTROL", "VOL CONTROL set Current Volume to "+ curVol);
 
+
         }
+
     }
 
     public void setVolume(int vol){
