@@ -183,6 +183,9 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
             editor.putInt("accelerationThresholdProg",accelerationThresholdProg);
             editor.putBoolean("accMode",accMode);
             editor.apply();
+        }else{
+            Log.d("PREF","Prefs not saved, because profile_prefs = null");
+
         }
 
     }

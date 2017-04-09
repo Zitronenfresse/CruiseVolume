@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "234923831863",
+    "firebase_url": "https://cruisevolume.firebaseio.com",
+    "project_id": "cruisevolume",
+    "storage_bucket": "cruisevolume.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:234923831863:android:b455478d9a3ae8f3",
+        "android_client_info": {
+          "package_name": "com.procrastech.cruisevolume"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "234923831863-t1rvpdgcbucsutseh56a6lvqe0t9q60q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.procrastech.cruisevolume",
+            "certificate_hash": "8c7e8e46c4ebbf9199d1d8297f0d904c2bbfcad1"
+          }
+        },
+        {
+          "client_id": "234923831863-5tv6cgpegvcuc0ou33tickucsouibdou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhg91oYsbxJ094CWn3tpGa4ZzHnP_S3Gw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "234923831863-5tv6cgpegvcuc0ou33tickucsouibdou.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -44,12 +44,28 @@ public class translucentLauncher extends AppCompatActivity {
             }
         }
 
+    }
 
+    @Override
+    protected void onNewIntent(Intent intent){
+        if (intent.hasExtra("news_only")) {
+            finish();
+        }
+        if (intent.hasExtra("click_action")) {
+            ClickActionHelper.startActivity(intent.getStringExtra("click_action"), intent.getExtras(), this);
+            finish();
+        }else{
+            action = "";
+            if(intent.getAction()!=null){
+                action = intent.getAction();
+            }
 
-
-
-
-
+            if(checkPlayServices()){
+                if(checkForPermissions()){
+                    handleIntent();
+                };
+            }
+        }
     }
 
     private void handleIntent(){

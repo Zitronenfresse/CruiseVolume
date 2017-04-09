@@ -17,12 +17,14 @@ import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -30,6 +32,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static com.procrastech.cruisevolume.tabSettingsActivity.ACTION_STOP_SETTINGS;
 import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_ACTIVE_PROFILE_NUMBER;
 import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_MODE_PREFS;
 import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_PROFILE_PREFS;
@@ -64,6 +70,8 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public static final String ACTION_UPDATE_PREFS = "com.procrastech.cruisevolume.ACTION_UPDATE_PREFS";
     private boolean startLocationUpdatesOnAPIConnected = false;
 
+    private Handler handler;
+    private long mVolumeUpdateDelay = 1000;
 
     SharedPreferences mode_prefs;
     SharedPreferences profile_prefs;
@@ -127,6 +135,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
             handleIntent(intent);
         }
         startForeground(1,buildForegroundNotification());
+        initSharedPreferences();
 
         return START_REDELIVER_INTENT;
     }
@@ -163,48 +172,12 @@ public class CruiseService extends Service implements com.google.android.gms.loc
                 }
                 stopForeground(true);
                 stopSelf();
-                System.exit(0);
-                break;
-            case ACTION_UPDATE_PREFS :
-                Boolean slowgain = intent.getBooleanExtra("slowGainMode",slowGainMode);
-                Boolean accM = intent.getBooleanExtra("accMode",accMode);
-                int startVolume = intent.getIntExtra("startVol",startVol);
-                int endVolume = intent.getIntExtra("endVol",endVol);
-                int startingSpeed = intent.getIntExtra("startSpeed",startSpeed);
-                int endingSpeed = intent.getIntExtra("endSpeed",endSpeed);
-                int updateInterval = intent.getIntExtra("mUpdateInterval",mUpdateInterval);
-                int threshold = intent.getIntExtra("accelerationThreshold",accelerationThreshold);
-                updateParams(slowgain,startingSpeed,endingSpeed,startVolume,endVolume,updateInterval,threshold,accM);
-                createBoundaries();
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_STOP_SETTINGS));
                 break;
             default:
         }
     }
 
-    private void updateParams(boolean slowgain, int startspeed, int endspeed, int startVol, int endVol,int updateInterval,int accelerationThreshold, boolean accMode) {
-        Log.d("MY","Updating");
-
-        slowGainMode = slowgain;
-        this.accMode = accMode;
-        startSpeed = startspeed;
-        endSpeed = endspeed;
-        this.startVol = startVol;
-        this.endVol = endVol;
-        this.accelerationThreshold = accelerationThreshold;
-
-        if(mUpdateInterval!=updateInterval){
-            if(mConnectedToAPI&&updatingLocation){
-                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
-            }
-            mUpdateInterval = updateInterval;
-            cachedUpdateInterval = -1;
-            if(mConnectedToAPI&&updatingLocation){
-                requestLocationUpdates();
-            }
-
-        }
-
-    }
 
 
     protected void createBoundaries(){
@@ -228,8 +201,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public void onCreate(){
         super.onCreate();
 
-        initSharedPreferences();
-
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -243,10 +214,11 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         mode_changed_listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                active_profile_number = sharedPreferences.getInt(KEY_ACTIVE_PROFILE_NUMBER,1);
+                active_profile_number = mode_prefs.getInt(KEY_ACTIVE_PROFILE_NUMBER,1);
                 profile_prefs.unregisterOnSharedPreferenceChangeListener(profile_changed_listener);
                 profile_prefs = getSharedPreferences(KEY_PROFILE_PREFS+active_profile_number,0);
                 profile_prefs.registerOnSharedPreferenceChangeListener(profile_changed_listener);
+                loadProfilePreferences();
             }
         };
 
@@ -268,14 +240,30 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
     private void loadProfilePreferences() {
+
+        Log.d("PREF",KEY_PROFILE_PREFS+active_profile_number+" loaded in Service");
+
         slowGainMode = profile_prefs.getBoolean("slowGainMode", true);
         startVol = profile_prefs.getInt("volSetOne",5);
         endVol = profile_prefs.getInt("volSetTwo",10);
         startSpeed = profile_prefs.getInt("speedSetOne",50);
         endSpeed = profile_prefs.getInt("speedSetTwo", 99) + startSpeed;
-        mUpdateInterval = profile_prefs.getInt("updateInterval",1000);
+        int updateInterval = profile_prefs.getInt("updateInterval",1000);
         accelerationThreshold = profile_prefs.getInt("accelerationThreshold",10);
         accMode = profile_prefs.getBoolean("accMode",false);
+        if(mUpdateInterval!=updateInterval){
+            if(mConnectedToAPI&&updatingLocation){
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+            }
+            mUpdateInterval = updateInterval;
+            cachedUpdateInterval = -1;
+            if(mConnectedToAPI&&updatingLocation){
+                requestLocationUpdates();
+            }
+
+        }
+        createBoundaries();
+
     }
 
     private void initAccSensor() {
@@ -322,6 +310,15 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         return mBuilder.build();
     }
 
+    private Runnable runnableVolAdjuster = new Runnable() {
+        @Override
+        public void run() {
+      /* do what you need to do */
+            updateVolume();
+      /* and here comes the "trick" */
+            handler.postDelayed(this, mVolumeUpdateDelay);
+        }
+    };
 
     private void createLocationRequest() {
         mLocationRequest = LocationRequest.create();
@@ -354,6 +351,11 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     protected void startLocationUpdates() {
 
+        handler = new Handler();
+        handler.postDelayed(runnableVolAdjuster, mVolumeUpdateDelay);
+        if (initVol == -1) {
+            initVol = curVol;
+        }
         requestLocationUpdates();
         Log.d("LOCATION", "Starting Location updates");
         updatingLocation = true;
@@ -365,6 +367,13 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
 
     protected void stopLocationUpdates(){
+
+        if(initVol!=-1){
+            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,initVol,0);
+            initVol = -1;
+        }
+
+        handler.removeCallbacks(runnableVolAdjuster);
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         updatingLocation = false;
         Log.d("LOCATION", "Stopping Location updates");
@@ -374,9 +383,10 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     @Override
     public void onLocationChanged(Location location) {
         Log.d("LOCATION","updating = "+updatingLocation+"  connectedToAPI = " +mConnectedToAPI+"  accmode = "+accMode+"  updateInterval = "+mUpdateInterval +  "  cachedUpdateInterval = "+ cachedUpdateInterval);
+        Log.d("PREF",active_profile_number+" active profile number");
 
         if(cachedUpdateInterval!=-1){
-            if(quickUpdateCounter > 0){
+            if(quickUpdateCounter > 0){d 
                 quickUpdateCounter--;
             }else{
                 mUpdateInterval = cachedUpdateInterval;
@@ -392,37 +402,21 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     public void volumeControl(int speed){
         if(boundarr!=null&&volarr!=null){
-            Log.d("CONTROL", "VOL CONTROL Cycle with speed "+speed+" :");
+            //Log.d("CONTROL", "VOL CONTROL Cycle with speed "+speed+" :");
             curVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 
-            if(speed<boundarr[0]){
-                if(initVol!=-1){
-                    Log.d("CONTROL", "VOL CONTROL set Volume back to Initial Volume at "+initVol+".");
-                    setVolume(initVol);
-                    initVol = -1;
-                }
 
-            }else{
-                if(initVol == -1){
-                    if(curVol<=volarr[0]){
-                        initVol = curVol;
-                    }else{
-                        initVol = volarr[0];
-                    }
-                    Log.d("CONTROL", "VOL CONTROL set Initial Volume to "+initVol+".");
+
+            for(int i = boundarr.length-1; i >= 0;i--){
+                if(speed < boundarr[i]){
+                    continue;
                 }
-                for(int i = boundarr.length-1; i >= 0;i--){
-                    if(speed < boundarr[i]){
-                        continue;
-                    }
-                    setVolume(volarr[i]);
-                    Log.d("CONTROL", "VOL CONTROL set Goal Volume to "+ volarr[i]+" at " +speed+"km/h");
-                    break;
-                }
+                setVolume(volarr[i]);
+                //Log.d("CONTROL", "VOL CONTROL set Goal Volume to "+ volarr[i]+" at " +speed+"km/h");
+                break;
             }
 
-            //TODO: Move updateVolume to own handler with adjustable update-frequency - IMPORTANT
-            updateVolume();
+
         }
     }
 
@@ -440,16 +434,16 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     }
 
     private void incrementVol() {
-        if (initVol != -1) {
-            if(curVol<goalVol){
-                curVol++;
-            }else{
-                if(curVol>goalVol){
-                    curVol--;
-                }
-            }
 
+        if(curVol<goalVol){
+            curVol++;
+        }else{
+            if(curVol>goalVol){
+                curVol--;
+            }
         }
+
+
 
     }
 
@@ -457,9 +451,11 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         if(slowGainMode){
             incrementVol();
         }
-        Log.d("CONTROL", "VOL CONTROL set Current Volume to "+ curVol);
+        if(curVol!=goalVol){
+            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,curVol,0);
+            Log.d("CONTROL", "VOL CONTROL set Current Volume to "+ curVol);
 
-        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,curVol,0);
+        }
     }
 
     public void setVolume(int vol){

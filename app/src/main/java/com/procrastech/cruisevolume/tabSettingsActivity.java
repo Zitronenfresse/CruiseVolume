@@ -1,10 +1,14 @@
 package com.procrastech.cruisevolume;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,6 +44,7 @@ public class tabSettingsActivity extends AppCompatActivity {
     protected static final String KEY_ACTIVE_PROFILE_NUMBER = "KEY_ACTIVE_PROFILE_NUMBER";
     protected static final String KEY_MODE_PREFS = "KEY_MODE_PREFS";
     protected static final String KEY_PROFILE_PREFS = "KEY_PROFILE_PREFS";
+    public static final String ACTION_STOP_SETTINGS = "com.procrastech.cruisevolume.ACTION_STOP_SETTINGS";
 
     private AdView mAdView;
 
@@ -49,15 +54,24 @@ public class tabSettingsActivity extends AppCompatActivity {
     private static final String TAG = "tabSettings";
     static final String ITEM_SKU = "proversion";
 
-    private Button buyButton;
     IabHelper mHelper;
 
+
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            finish();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent intent = new Intent(this, CruiseService.class);
+        startService(intent);
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,new IntentFilter(ACTION_STOP_SETTINGS));
 
 
         SharedPreferences settings = getSharedPreferences(KEY_MODE_PREFS, 0);
@@ -74,7 +88,6 @@ public class tabSettingsActivity extends AppCompatActivity {
 
         }
 
-        buyButton = (Button)findViewById(R.id.buyButton);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         allTabs = (TabLayout) findViewById(R.id.tabs);
@@ -269,6 +282,8 @@ public class tabSettingsActivity extends AppCompatActivity {
             mHelper.dispose();
         }
         mHelper = null;
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+
     }
 
 }
