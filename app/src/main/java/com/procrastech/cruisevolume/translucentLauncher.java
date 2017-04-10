@@ -1,12 +1,16 @@
 package com.procrastech.cruisevolume;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -14,6 +18,8 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 public class translucentLauncher extends AppCompatActivity {
 
+    boolean isFirstTime;
+    private static final String IS_FIRST_TIME = "IS_FIRST_TIME";
     private final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 2;
     private static String action = "";
@@ -22,6 +28,12 @@ public class translucentLauncher extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences settings = getSharedPreferences(tabSettingsActivity.KEY_MODE_PREFS, 0);
+        isFirstTime = settings.getBoolean(IS_FIRST_TIME,true);
+        settings.edit().putBoolean(IS_FIRST_TIME, false).apply();
+
+
 
         Intent intent = getIntent();
 
@@ -83,7 +95,20 @@ public class translucentLauncher extends AppCompatActivity {
                 break;
             default:
         }
-        finish();
+        if(isFirstTime){
+            setContentView(R.layout.translucentlauncher_layout);
+            LinearLayout l = (LinearLayout) findViewById(R.id.translucentLayout);
+            l.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    finish();
+                    return false;
+                }
+            });
+        }else{
+            finish();
+        }
+
     }
 
     private void initializeCruiseService() {

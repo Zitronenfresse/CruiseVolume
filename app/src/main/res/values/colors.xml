@@ -8,5 +8,6 @@
     <color name="color_light_green">#0ABABA</color>
     <color name="color_not_background">#9bcc5f</color>
     <color name="color_settingsfragment_background">#EAEAEA</color>
+    <color name="color_transparent_background">#90ffffff</color>
 
 </resources>

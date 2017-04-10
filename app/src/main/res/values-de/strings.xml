@@ -40,4 +40,5 @@
     <string name="updateInterval">GPS-Daten alle %1$d ms empfangen</string>
     <string name="banner_ad_unit_id">ca-app-pub-4077367878822895/5226301761</string>
     <string name="build_info_text">Version: %1$s</string>
+    <string name="translucent_info_text">CruiseVolume wurde gestartet und ist nun aktiv.Bedienen sie die App ueber die Benachrichtigung in ihrer Statusleiste. Dieser Bildschirm wird ihnen nur beim erstmaligen Start der App angezeigt. Tippen sie den Bildschirm an um diese Nachricht zu schließen.</string>
 </resources>
