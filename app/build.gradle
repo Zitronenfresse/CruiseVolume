@@ -15,8 +15,8 @@ android {
         applicationId "com.procrastech.cruisevolume"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 13
-        versionName "1.7"
+        versionCode 14
+        versionName "1.8 SquareshapedMeatballs"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -78,7 +78,6 @@ public class tabSettingsActivity extends AppCompatActivity {
 
         proVersion = !settings.getBoolean(KEY_PREF_PURCHASE_PROVERSION_AVAILABLE,true);
 
-
         if(proVersion){
             setContentView(R.layout.activity_tab_settings_pro);
 
@@ -90,16 +89,19 @@ public class tabSettingsActivity extends AppCompatActivity {
 
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+
+
         allTabs = (TabLayout) findViewById(R.id.tabs);
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mSettingsFragment = new SettingsFragment();
         mProfilesFragment = new ProfilesFragment();
         mInfoFragment = new InfoFragment();
-        adapter.addFragment(mSettingsFragment, "Settings");
-        adapter.addFragment(mProfilesFragment, "Profiles");
-        adapter.addFragment(mInfoFragment, "Info");
+        adapter.addFragment(mSettingsFragment, getString(R.string.tabSettings_settingsTab_text));
+        adapter.addFragment(mProfilesFragment, getString(R.string.tabSetting_profilesTab_text));
+        adapter.addFragment(mInfoFragment, getString(R.string.tabSettings_infoTab_text));
         viewPager.setAdapter(adapter);
         allTabs.setupWithViewPager(viewPager);
+
 
         String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArXjuny14c2ZLblnB7cPO0zCG2xr0SVIOwkDEH28lnangmNNtP3/+q0ecDnoiGQITp9XKtTwSn69G/Dz+U4MPBE2g25a3JFeADc0H3yd30meUmWSHOv2Pmtg09iTwc9Ct3elpIQilCv1ker67Dei4l5Buy5mNT4y2xUSwy0mJQpecZWGaXmDX5Zc3wE3MCBgQbYhD6hCw3GZYzKlEdfbbJSzvZh28+uHnag6YdRaS3OqZmFfj4Cc5bmKD7kgbIZ7G0AUfETy4d2/5bdpcQ1Nk6j4stHN7eYqChItWTTH7ccJjOlp5zaQQMBIzwe4+8pptcOaR6Misd60cLQEs2Hdp6wIDAQAB";
 
@@ -228,11 +230,11 @@ public class tabSettingsActivity extends AppCompatActivity {
         //emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
 
         try {
-            startActivity(Intent.createChooser(emailIntent, "Send Feedback"));
+            startActivity(Intent.createChooser(emailIntent, getString(R.string.sendfeedback_chooser_text)));
 
             Log.d("EMAIL","Finished sending email...");
         } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(this,"There is no email client installed.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.sendfeedback_noClientInstalledToast_text, Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CruiseVolume</string>
+    <string name="accelerationThreshold">Sensitivtät des Beschleunigungssensors %1$d</string>
+    <string name="accmode_switch_text">Beschleunigungssensor benutzen</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="buy_pro">Pro Version kaufen (entfernt Werbung)</string>
+    <string name="disclaimerText">Haftungsausschluss: Diese Anwendung reguliert die Lautstärke ihrer Musik. Verwenden sie die Anwendung gemäß lokaler Gesetze und fahren sie sicher.</string>
+    <string name="enter_your_feedback_here_text">Geben sie Verbesserungsvorschläge und Kritik hier ein</string>
+    <string name="feedback_title_text">Ihre Meinung ist uns wichtig!</string>
+    <string name="final_speed">Erreichen der finalen Lautstärke ab %1$d km/h</string>
+    <string name="final_volume">mit dem Lautstärkepegel %1$d</string>
+    <string name="incAdjSwitchText">Langsame Anpassung der Lautstärke</string>
+    <string name="notification_action_pause_text">Pause</string>
+    <string name="notification_action_resume_text">Fortsetzen</string>
+    <string name="notification_action_settings_text">Einstellungen</string>
+    <string name="notification_action_stop_text">Stop</string>
+    <string name="notification_content_is_paused_text">ist pausiert</string>
+    <string name="notification_content_is_running_text">ist aktiv</string>
+    <string name="notification_title_shortappname_text">CruiseVolume</string>
+    <string name="onset_speed">Lautstärkeregelung beginnt ab %1$d km/h</string>
+    <string name="onset_volume">mit dem Lautstärkepegel %1$d</string>
+    <string name="profile_five_text">Profil Fünf</string>
+    <string name="profile_four_text">Profil Vier</string>
+    <string name="profile_helper_text">Profil gedrueckt halten um es umzubennen</string>
+    <string name="profile_one_text">Profil Eins</string>
+    <string name="profile_three_text">Profil Drei</string>
+    <string name="profile_two_text">Profil Zwei</string>
+    <string name="profiles_renameDialogNegativeButton_text">Abbrechen</string>
+    <string name="profiles_renameDialogPositiveButton_text">Umbenennen</string>
+    <string name="profiles_renameDialog_text">Umbenennen von</string>
+    <string name="rotatinglogo_content_description">rotierendes Logo</string>
+    <string name="send_feedback_button_text">Feedback absenden</string>
+    <string name="sendfeedback_chooser_text">Feedback absenden</string>
+    <string name="sendfeedback_noClientInstalledToast_text">Keine Email-Anwendung installiert.</string>
+    <string name="tabSetting_profilesTab_text">Profile</string>
+    <string name="tabSettings_infoTab_text">Informationen</string>
+    <string name="tabSettings_settingsTab_text">Einstellungen</string>
+    <string name="title_activity_settings_menu_tabbed_acitivity">"SettingsMenuTabbedAcitivity     "</string>
+    <string name="updateInterval">GPS-Daten alle %1$d ms empfangen</string>
+    <string name="banner_ad_unit_id">ca-app-pub-4077367878822895/5226301761</string>
+    <string name="build_info_text">Version: %1$s</string>
+</resources>

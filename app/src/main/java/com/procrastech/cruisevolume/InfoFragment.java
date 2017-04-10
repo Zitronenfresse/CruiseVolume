@@ -1,15 +1,13 @@
 package com.procrastech.cruisevolume;
 
-import android.content.Intent;
-import android.net.Uri;
+import com.procrastech.cruisevolume.BuildConfig;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
 /**
  * Created by IEnteramine on 04.04.2017.
@@ -18,7 +16,7 @@ import android.widget.Toast;
 public class InfoFragment extends Fragment {
 
     EditText editFeedbackContent;
-
+    TextView buildInfo;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -31,11 +29,13 @@ public class InfoFragment extends Fragment {
 
         }
         getAllWidgets(view);
-
+        String version = BuildConfig.VERSION_NAME;
+        buildInfo.setText(getString(R.string.build_info_text,version));
         return view;
     }
 
     private void getAllWidgets(View view) {
+        buildInfo = (TextView) view.findViewById(R.id.buildInfoTextView);
         editFeedbackContent = (EditText) view.findViewById(R.id.editFeedbackContent);
 
     }

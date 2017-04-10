@@ -48,7 +48,6 @@
                 <action android:name="com.procrastech.cruisevolume.ACTION_STOP_UPDATES" />
                 <action android:name="com.procrastech.cruisevolume.ACTION_START_SERVICE" />
                 <action android:name="com.procrastech.cruisevolume.ACTION_STOP_SERVICE" />
-                <action android:name="com.procrastech.cruisevolume.ACTION_UPDATE_PREFS" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -60,7 +59,6 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".SettingsActivity" />
         <activity android:name=".tabSettingsActivity"
             android:launchMode="singleTop">
             <intent-filter>

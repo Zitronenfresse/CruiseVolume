@@ -1,16 +1,44 @@
 <resources>
     <string name="app_name">CruiseVolume</string>
-    <string name="launchButtonText">LAUNCH</string>
     <string name="disclaimerText">Disclaimer: This App intends to regulate your music-volume for you based on speed, acceleration and backgroundnoise. Use at your own risk. Use your brain.</string>
     <string name="incAdjSwitchText">Incremental Volume-adjustments</string>
-    <string name="final_speed_and_volume_level">Final Speed and Volume Level</string>
-    <string name="onset_speed_and_volume_level">Onset Speed and Volume Level</string>
-    <string name="setUpdateIntervalText">Set Update Interval for GPS-Requests</string>
+    <string name="updateInterval">Request GPS-Data every %1$d ms</string>
+    <string name="accelerationThreshold">Acceleration sensitivity to trigger quick location requests %1$d</string>
+    <string name="final_speed">Reach final Volume at %1$d km/h</string>
+    <string name="final_volume">with a Volume Level of %1$d</string>
+    <string name="onset_speed">Start Volume Adjustements at %1$d km/h</string>
+    <string name="onset_volume">with a Volume Level of %1$d</string>
     <string name="banner_ad_unit_id">ca-app-pub-4077367878822895/5226301761</string>
     <string name="title_activity_settings_menu_tabbed_acitivity">SettingsMenuTabbedAcitivity
     </string>
     <string name="action_settings">Settings</string>
-    <string name="section_format">Hello World from section: %1$d</string>
     <string name="buy_pro">Buy Pro (removes Ads)</string>
+    <string name="accmode_switch_text">Listen to linear Acceleration</string>
+    <string name="rotatinglogo_content_description">rotatingLogo</string>
+    <string name="enter_your_feedback_here_text">Enter your Feedback here</string>
+    <string name="send_feedback_button_text">Send Feedback</string>
+    <string name="feedback_title_text">If you have a minute...</string>
+    <string name="build_info_text">Version: %1$s</string>
+    <string name="profile_helper_text">Long press on Profile to Rename</string>
+    <string name="notification_action_pause_text">Pause</string>
+    <string name="notification_action_resume_text">Resume</string>
+    <string name="notification_content_is_running_text">is running</string>
+    <string name="notification_content_is_paused_text">is paused</string>
+    <string name="notification_action_stop_text">Stop</string>
+    <string name="notification_action_settings_text">Settings</string>
+    <string name="notification_title_shortappname_text">CruiseVolume</string>
+    <string name="tabSettings_settingsTab_text">Settings</string>
+    <string name="tabSetting_profilesTab_text">Profiles</string>
+    <string name="tabSettings_infoTab_text">Info</string>
+    <string name="sendfeedback_chooser_text">Send Feedback</string>
+    <string name="sendfeedback_noClientInstalledToast_text">There is no email client installed.</string>
+    <string name="profiles_renameDialog_text">Rename</string>
+    <string name="profiles_renameDialogPositiveButton_text">Rename</string>
+    <string name="profiles_renameDialogNegativeButton_text">Cancel</string>
+    <string name="profile_one_text">Profile One</string>
+    <string name="profile_two_text">Profile Two</string>
+    <string name="profile_three_text">Profile Three</string>
+    <string name="profile_four_text">Profile Four</string>
+    <string name="profile_five_text">Profile Five</string>
 
 </resources>

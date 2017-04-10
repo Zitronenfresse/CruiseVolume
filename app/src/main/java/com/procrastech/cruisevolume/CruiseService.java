@@ -14,7 +14,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.media.AudioManager;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,9 +30,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static com.procrastech.cruisevolume.tabSettingsActivity.ACTION_STOP_SETTINGS;
 import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_ACTIVE_PROFILE_NUMBER;
@@ -66,7 +62,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public static final String ACTION_STOP_UPDATES = "com.procrastech.cruisevolume.ACTION_STOP_UPDATES";
     public static final String ACTION_STOP_SERVICE = "com.procrastech.cruisevolume.ACTION_STOP_SERVICE";
     public static final String ACTION_START_UPDATES = "com.procrastech.cruisevolume.ACTION_START_UPDATES";
-    public static final String ACTION_UPDATE_PREFS = "com.procrastech.cruisevolume.ACTION_UPDATE_PREFS";
     private boolean startLocationUpdatesOnAPIConnected = false;
 
     private Handler handler;
@@ -269,7 +264,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     private Notification buildForegroundNotification(){
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
-        mBuilder.setContentTitle("CruiseVolume");
+        mBuilder.setContentTitle(getString(R.string.notification_title_shortappname_text));
         mBuilder.setSmallIcon(R.drawable.noticon);
         mBuilder.setOngoing(true);
         if( Build.VERSION.SDK_INT < 23){
@@ -280,25 +275,28 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         Intent stopTargetIntent = new Intent(this, CruiseService.class);
         stopTargetIntent.setAction(ACTION_STOP_SERVICE);
         PendingIntent stopIntent = PendingIntent.getService(this, 0, stopTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.ic_not_stop,"Stop",stopIntent);
+        NotificationCompat.Action stopaction = new NotificationCompat.Action.Builder(R.drawable.ic_not_stop, getString(R.string.notification_action_stop_text), stopIntent).build();
+        mBuilder.addAction(stopaction);
 
         Intent pauseTargetIntent = new Intent(this, CruiseService.class);
         String pauseResume;
         if(updatingLocation){
-            pauseResume = "Pause";
+            pauseResume = getString(R.string.notification_action_pause_text);
             pauseTargetIntent.setAction(ACTION_STOP_UPDATES);
-            mBuilder.setContentText("is running");
+            mBuilder.setContentText(getString(R.string.notification_content_is_running_text));
         }else{
             pauseTargetIntent.setAction(ACTION_START_UPDATES);
-            pauseResume = "Resume";
-            mBuilder.setContentText("is paused");
+            pauseResume = getString(R.string.notification_action_resume_text);
+            mBuilder.setContentText(getString(R.string.notification_content_is_paused_text));
         }
         PendingIntent pauseIntent = PendingIntent.getService(this, 0, pauseTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.ic_not_pause,pauseResume,pauseIntent);
+        NotificationCompat.Action pauseaction = new NotificationCompat.Action.Builder(R.drawable.ic_not_pause, pauseResume, pauseIntent).build();
+        mBuilder.addAction(pauseaction);
 
         Intent tabsettingsTargetIntent = new Intent(this, tabSettingsActivity.class);
         PendingIntent tabsettingsIntent = PendingIntent.getActivity(this, 0, tabsettingsTargetIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.ic_one,"Settings",tabsettingsIntent);
+        NotificationCompat.Action settingsaction = new NotificationCompat.Action.Builder(R.drawable.ic_not_settings, getString(R.string.notification_action_settings_text), tabsettingsIntent).build();
+        mBuilder.addAction(settingsaction);
 
         mBuilder.setPriority(Notification.PRIORITY_MAX);
         return mBuilder.build();

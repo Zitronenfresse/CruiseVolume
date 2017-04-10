@@ -24,7 +24,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="55dp">
+        android:layout_height="50dp"
+        android:background="@color/color_settingsfragment_background">
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"
@@ -33,7 +34,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             ads:adSize="BANNER"
-            ads:adUnitId="@string/banner_ad_unit_id"></com.google.android.gms.ads.AdView>
+            ads:adUnitId="@string/banner_ad_unit_id" />
 
     </RelativeLayout>
 

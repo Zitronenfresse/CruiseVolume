@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import android.widget.RadioGroup;
 import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_ACTIVE_PROFILE_NUMBER;
 import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_MODE_PREFS;
 import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_PROFILE;
-import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_PROFILE_PREFS;
 
 /**
  * Created by IEnteramine on 04.04.2017.
@@ -26,6 +24,8 @@ public class ProfilesFragment extends Fragment {
 
     SharedPreferences mode_prefs;
     private int active_profile_number;
+
+    AlertDialog renameDialog;
 
     RadioGroup.OnCheckedChangeListener profileGroupListener;
     RadioGroup profileGroup;
@@ -56,10 +56,10 @@ public class ProfilesFragment extends Fragment {
                 final EditText edittext = new EditText(getContext());
                 final RadioButton r = (RadioButton)v;
 
-                alert.setTitle("Rename "+ r.getText());
+                alert.setTitle(getString(R.string.profiles_renameDialog_text)+ r.getText());
                 alert.setView(edittext);
 
-                alert.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                alert.setPositiveButton(R.string.profiles_renameDialogPositiveButton_text, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String newName = edittext.getText().toString();
                         r.setText(newName);
@@ -75,13 +75,13 @@ public class ProfilesFragment extends Fragment {
                     }
                 });
 
-                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                alert.setNegativeButton(R.string.profiles_renameDialogNegativeButton_text, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // what ever you want to do with No option.
                     }
                 });
 
-                alert.show();
+                renameDialog = alert.show();
                 return true;
             }
         };
@@ -107,6 +107,9 @@ public class ProfilesFragment extends Fragment {
     @Override
     public void onDestroy(){
         super.onDestroy();
+        if(renameDialog!=null){
+            renameDialog.dismiss();
+        }
         //profileGroup.setOnCheckedChangeListener(null);
 
     }

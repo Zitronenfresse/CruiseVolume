@@ -1,6 +1,5 @@
 package com.procrastech.cruisevolume;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
@@ -191,13 +190,12 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
     }
 
     public void updateUI(){
-        speedTextOne.setText(mSpeedSetOne +" km/h");
-        speedTextTwo.setText(mSpeedSetTwoTotal +" km/h");
-        updateIntervalText.setText(mUpdateInterval+ " ms");
-        volTextOne.setText(mVolSetOne+"");
-        volTextTwo.setText(mVolSetTwo+"");
-        thrText.setText(accelerationThreshold+"");
-        slowGainModeSwitch.setChecked(mSlowGainMode);
+        speedTextOne.setText(getString(R.string.onset_speed,mSpeedSetOne));
+        speedTextTwo.setText(getString(R.string.final_speed,mSpeedSetTwoTotal));
+        updateIntervalText.setText(getString(R.string.updateInterval,mUpdateInterval));
+        volTextOne.setText(getString(R.string.onset_volume,mVolSetOne));
+        volTextTwo.setText(getString(R.string.final_volume,mVolSetTwo));
+        thrText.setText(getString(R.string.accelerationThreshold,accelerationThreshold));
 
     }
 
@@ -210,6 +208,7 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
         volBarOne.setProgress(mVolSetOne);
         volBarTwo.setProgress(mVolSetTwo);
         accModeSwitch.setChecked(accMode);
+        slowGainModeSwitch.setChecked(mSlowGainMode);
 
     }
 
@@ -284,7 +283,10 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
 
     @Override
     public void onDestroy() {
-        mode_prefs.unregisterOnSharedPreferenceChangeListener(mode_changed_listener);
+        if(mode_changed_listener!=null){
+            mode_prefs.unregisterOnSharedPreferenceChangeListener(mode_changed_listener);
+
+        }
         super.onDestroy();
     }
 
