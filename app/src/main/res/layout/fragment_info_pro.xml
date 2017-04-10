@@ -10,8 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
->
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,11 +19,28 @@
             android:background="@drawable/customborder"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/buildInfoTextView"
+            <Button
+                android:id="@+id/developerWebsiteButton"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/build_info_text" />
+                android:text="@string/developerWebsiteText" />
+
+            <Button
+                android:id="@+id/privacyPolicyButton"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/privacyPolicyText" />
+
+            <Button
+                android:id="@+id/disclaimerButton"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/disclaimer_text" />
+
+
         </LinearLayout>
 
         <Space
@@ -60,6 +76,25 @@
                 android:onClick="onSendFeebackButton"
                 android:text="@string/send_feedback_button_text" />
 
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/customborder"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/buildInfoTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/build_info_text" />
         </LinearLayout>
 
     </LinearLayout>

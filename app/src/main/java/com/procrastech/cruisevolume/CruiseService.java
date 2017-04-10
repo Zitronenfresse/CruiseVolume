@@ -80,11 +80,9 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     private Sensor senLinearAcceleration;
 
 
-    //TODO: Translate (at least to german)
     //TODO: Pause-mode when Location is not changing - NOT IMPORTANT
     //TODO: Awareness API integration- NOT IMPORTANT
     //TODO: Calculate Speed inbetween updates via Linear Acceleration and correct at update- NOT IMPORTANT BUT COOL
-    //TODO: Initial Wizard
 
 
     public void onSensorChanged(SensorEvent sensorEvent) {

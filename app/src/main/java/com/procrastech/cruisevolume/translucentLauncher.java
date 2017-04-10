@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -101,6 +100,8 @@ public class translucentLauncher extends AppCompatActivity {
             l.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
+                    Intent startSettingsIntent = new Intent(translucentLauncher.this,tabSettingsActivity.class);
+                    startActivity(startSettingsIntent);
                     finish();
                     return false;
                 }

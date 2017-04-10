@@ -40,6 +40,9 @@
     <string name="profile_three_text">Profile Three</string>
     <string name="profile_four_text">Profile Four</string>
     <string name="profile_five_text">Profile Five</string>
-    <string name="translucent_info_text">CruiseVolume is now active. Access Control and Settings via the Notification in your Statusbar.</string>
+    <string name="translucent_info_text">CruiseVolume is now active. Access Control and Settings via the Notification in your Statusbar. Tap to open the Settings Screen</string>
+    <string name="developerWebsiteText">Developer Homepage</string>
+    <string name="privacyPolicyText">Privacy Policy</string>
+    <string name="disclaimer_text">Disclaimer</string>
 
 </resources>
