@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -19,19 +22,22 @@ public class translucentLauncher extends AppCompatActivity {
 
     boolean isFirstTime;
     private static final String IS_FIRST_TIME = "IS_FIRST_TIME";
+    protected static final String START_WITH_WAVE = "START_WITH_WAVE";
     private final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 2;
     private static String action = "";
     private static boolean requestCalledBack = false;
+    private boolean startWithWave = false;
+    SharedPreferences settings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences settings = getSharedPreferences(tabSettingsActivity.KEY_MODE_PREFS, 0);
+         settings = getSharedPreferences(tabSettingsActivity.KEY_MODE_PREFS, 0);
         isFirstTime = settings.getBoolean(IS_FIRST_TIME,true);
-        settings.edit().putBoolean(IS_FIRST_TIME, false).apply();
-
+        startWithWave = settings.getBoolean(START_WITH_WAVE,false);
 
 
         Intent intent = getIntent();
@@ -96,18 +102,104 @@ public class translucentLauncher extends AppCompatActivity {
         }
         if(isFirstTime){
             setContentView(R.layout.translucentlauncher_layout);
+            final ImageView v = (ImageView) findViewById(R.id.wave);
+
+            Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fadein);
+            final Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fadeout);
+            fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    v.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            v.startAnimation(fadeInAnimation);
+            fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+
+                    v.startAnimation(fadeOutAnimation);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
             LinearLayout l = (LinearLayout) findViewById(R.id.translucentLayout);
             l.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     Intent startSettingsIntent = new Intent(translucentLauncher.this,tabSettingsActivity.class);
                     startActivity(startSettingsIntent);
+                    settings.edit().putBoolean(IS_FIRST_TIME, false).apply();
                     finish();
                     return false;
                 }
             });
         }else{
-            finish();
+            if(startWithWave){
+                setContentView(R.layout.translucentlauncherminimal_layout);
+                final ImageView v = (ImageView) findViewById(R.id.wave);
+
+                Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fadein);
+                final Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fadeout);
+                fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        v.setVisibility(View.INVISIBLE);
+                        finish();
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                v.startAnimation(fadeInAnimation);
+                fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+
+                        v.startAnimation(fadeOutAnimation);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+            }else{
+                finish();
+            }
+
+
         }
 
     }

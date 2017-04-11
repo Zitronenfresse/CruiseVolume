@@ -44,4 +44,5 @@
     <string name="developerWebsiteText">Entwickler Homepage</string>
     <string name="disclaimer_text">Haftungsausschluß</string>
     <string name="privacyPolicyText">Datenschutzerklärung</string>
+    <string name="startwithwave_text">Animation bei Anwendungsstart</string>
 </resources>

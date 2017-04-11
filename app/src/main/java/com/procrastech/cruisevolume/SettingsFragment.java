@@ -39,6 +39,7 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
     TextView volTextTwo;
     Switch slowGainModeSwitch;
     Switch accModeSwitch;
+    Switch startWithWaveSwitch;
     TextView thrText;
     SeekBar thrBar;
     protected int mSpeedSetOne;
@@ -48,6 +49,7 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
     protected int mVolSetTwo;
     protected boolean mSlowGainMode;
     protected boolean accMode;
+    protected boolean startwithwave;
     protected int mUpdateInterval;
     protected int mUpdateIntervalProg;
     protected int accelerationThreshold;
@@ -75,9 +77,10 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, null);
+
         getAllWidgets(view);
         initSharedPreferences();
-
+        startWithWaveSwitch.setChecked(startwithwave);
         return view;
     }
 
@@ -94,6 +97,7 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
         thrBar = (SeekBar) view.findViewById(R.id.seekThreshold);
         thrText = (TextView) view.findViewById(R.id.textThreshold);
         accModeSwitch = (Switch) view.findViewById(R.id.switchAccMode);
+        startWithWaveSwitch = (Switch) view.findViewById(R.id.startWithWaveSwitch);
         speedBarOne = (SeekBar) view.findViewById(R.id.seekSpeedThrOne);
         speedTextOne = (TextView) view.findViewById(R.id.textSpeedThrOne);
         volBarOne = (SeekBar) view.findViewById(R.id.seekVolThrOne);
@@ -115,6 +119,9 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
         slowGainModeSwitch.setChecked(mSlowGainMode);
         accModeSwitch.setOnCheckedChangeListener(this);
         accModeSwitch.setChecked(accMode);
+        startWithWaveSwitch.setOnCheckedChangeListener(this);
+
+
         speedBarOne.setMax(100);
         speedBarTwo.setMax(100);
 
@@ -150,6 +157,8 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
         mode_prefs.registerOnSharedPreferenceChangeListener(mode_changed_listener);
 
         profile_prefs = getActivity().getSharedPreferences(KEY_PROFILE_PREFS+active_profile_number,0);
+
+        startwithwave = mode_prefs.getBoolean(translucentLauncher.START_WITH_WAVE,false);
         loadProfilePreferences();
     }
 
@@ -272,6 +281,12 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
                 break;
             case R.id.switchAccMode :
                 accMode = isChecked;
+                break;
+            case R.id.startWithWaveSwitch :
+                startwithwave = isChecked;
+                if(mode_prefs!=null){
+                    mode_prefs.edit().putBoolean(translucentLauncher.START_WITH_WAVE,isChecked).apply();
+                }
                 break;
         }
         saveProfilePreferences();

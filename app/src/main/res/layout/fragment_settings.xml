@@ -155,6 +155,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/accmode_switch_text" />
+
+            <Switch
+                android:id="@+id/startWithWaveSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/startwithwave_text" />
         </LinearLayout>
 
         <TextView

@@ -44,5 +44,6 @@
     <string name="developerWebsiteText">Developer Homepage</string>
     <string name="privacyPolicyText">Privacy Policy</string>
     <string name="disclaimer_text">Disclaimer</string>
+    <string name="startwithwave_text">Show animation on startup</string>
 
 </resources>
