@@ -21,13 +21,14 @@ import com.google.android.gms.common.GoogleApiAvailability;
 public class translucentLauncher extends AppCompatActivity {
 
     boolean isFirstTime;
-    private static final String IS_FIRST_TIME = "IS_FIRST_TIME";
+    protected static final String IS_FIRST_TIME = "IS_FIRST_TIME";
     protected static final String START_WITH_WAVE = "START_WITH_WAVE";
+    protected static final String AUTO_START = "AUTO_START";
     private final int MY_PERMISSIONS_REQUEST_ACCESS_LOCATION = 1;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 2;
-    private static String action = "";
     private static boolean requestCalledBack = false;
     private boolean startWithWave = false;
+    private boolean autoStart = false;
     SharedPreferences settings;
 
 
@@ -35,73 +36,25 @@ public class translucentLauncher extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-         settings = getSharedPreferences(tabSettingsActivity.KEY_MODE_PREFS, 0);
-        isFirstTime = settings.getBoolean(IS_FIRST_TIME,true);
-        startWithWave = settings.getBoolean(START_WITH_WAVE,false);
-
-
-        Intent intent = getIntent();
-
-        if (intent.hasExtra("news_only")) {
-            finish();
-        }
-        if (intent.hasExtra("click_action")) {
-            ClickActionHelper.startActivity(intent.getStringExtra("click_action"), intent.getExtras(), this);
-            finish();
-        }else{
-            action = "";
-            if(intent.getAction()!=null){
-                action = intent.getAction();
-            }
-
-            if(checkPlayServices()){
-                if(checkForPermissions()){
-                    handleIntent();
-                };
-            }
-        }
-
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent){
-        if (intent.hasExtra("news_only")) {
-            finish();
-        }
-        if (intent.hasExtra("click_action")) {
-            ClickActionHelper.startActivity(intent.getStringExtra("click_action"), intent.getExtras(), this);
-            finish();
-        }else{
-            action = "";
-            if(intent.getAction()!=null){
-                action = intent.getAction();
-            }
-
-            if(checkPlayServices()){
-                if(checkForPermissions()){
-                    handleIntent();
-                };
-            }
-        }
-    }
-
-    private void handleIntent(){
-        Log.d("Intent", "Intentaction is "+action+".");
-
-
-
-
-        switch (action){
-            case "" :
-                initializeCruiseService();
-                break;
-            case Intent.ACTION_MAIN :
-                initializeCruiseService();
-                break;
-            default:
-        }
+        loadPreferences();
+        checkForPermissions();
+        checkPlayServices();
         if(isFirstTime){
-            setContentView(R.layout.translucentlauncher_layout);
+            showFirstStartScreen();
+        }else{
+            showWaveAnimation();
+        }
+
+
+    }
+
+    private void showWaveAnimation() {
+        if(startWithWave){
+            View decorView = getWindow().getDecorView();
+            // Hide the status bar.
+            int ui = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(ui);
+            setContentView(R.layout.translucentlauncherminimal_layout);
             final ImageView v = (ImageView) findViewById(R.id.wave);
 
             Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fadein);
@@ -115,6 +68,9 @@ public class translucentLauncher extends AppCompatActivity {
                 @Override
                 public void onAnimationEnd(Animation animation) {
                     v.setVisibility(View.INVISIBLE);
+                    initializeCruiseService();
+                    finish();
+
                 }
 
                 @Override
@@ -140,97 +96,86 @@ public class translucentLauncher extends AppCompatActivity {
 
                 }
             });
-
-            LinearLayout l = (LinearLayout) findViewById(R.id.translucentLayout);
-            l.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    Intent startSettingsIntent = new Intent(translucentLauncher.this,tabSettingsActivity.class);
-                    startActivity(startSettingsIntent);
-                    settings.edit().putBoolean(IS_FIRST_TIME, false).apply();
-                    finish();
-                    return false;
-                }
-            });
         }else{
-            if(startWithWave){
-                setContentView(R.layout.translucentlauncherminimal_layout);
-                final ImageView v = (ImageView) findViewById(R.id.wave);
+            initializeCruiseService();
+            finish();
+        }
+    }
+    private void showFirstStartScreen(){
 
-                Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fadein);
-                final Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fadeout);
-                fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
+        setContentView(R.layout.translucentlauncher_layout);
+        final ImageView v = (ImageView) findViewById(R.id.wave);
 
-                    }
+        Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fadeinslow);
+        final Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fadeoutslow);
+        fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        v.setVisibility(View.INVISIBLE);
-                        finish();
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-                v.startAnimation(fadeInAnimation);
-                fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-
-                        v.startAnimation(fadeOutAnimation);
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-            }else{
-                finish();
             }
 
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                v.setVisibility(View.INVISIBLE);
+                initializeCruiseService();
+            }
 
-        }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
 
+            }
+        });
+        v.startAnimation(fadeInAnimation);
+        fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                v.startAnimation(fadeOutAnimation);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        LinearLayout l = (LinearLayout) findViewById(R.id.translucentLayout);
+        l.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Intent startSettingsIntent = new Intent(translucentLauncher.this,tabSettingsActivity.class);
+                startActivity(startSettingsIntent);
+                settings.edit().putBoolean(IS_FIRST_TIME, false).apply();
+                finish();
+                return false;
+            }
+        });
+
+    }
+
+    private void loadPreferences(){
+        settings = getSharedPreferences(tabSettingsActivity.KEY_MODE_PREFS, 0);
+        isFirstTime = settings.getBoolean(IS_FIRST_TIME,true);
+        startWithWave = settings.getBoolean(START_WITH_WAVE,false);
+        autoStart = settings.getBoolean(AUTO_START,false);
     }
 
     private void initializeCruiseService() {
         Intent intent = new Intent(this, CruiseService.class);
-        intent.setAction(CruiseService.ACTION_START_UPDATES);
+
+        if(autoStart){
+            intent.setAction(CruiseService.ACTION_START_UPDATES);
+        }else{
+            intent.setAction(CruiseService.ACTION_START_PAUSED);
+
+        }
         startService(intent);
     }
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_ACCESS_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                requestCalledBack = true;
 
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("MY", "Permissions granted");
-                    handleIntent();
-
-
-                } else {
-                    finish();
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
-    }
     private boolean checkPlayServices() {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(this);
@@ -253,8 +198,27 @@ public class translucentLauncher extends AppCompatActivity {
             return true;
         }
     }
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                requestCalledBack = true;
+
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("MY", "Permissions granted");
 
 
+                } else {
+                    finish();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
 
 
 }

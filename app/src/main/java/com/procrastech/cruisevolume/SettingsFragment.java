@@ -40,6 +40,7 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
     Switch slowGainModeSwitch;
     Switch accModeSwitch;
     Switch startWithWaveSwitch;
+    Switch autoStartSwitch;
     TextView thrText;
     SeekBar thrBar;
     protected int mSpeedSetOne;
@@ -69,8 +70,8 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
 
     SharedPreferences.OnSharedPreferenceChangeListener mode_changed_listener;
 
-    private int active_profile_number;
-
+    private static int active_profile_number;
+    private boolean autoStart;
 
 
     @Override
@@ -81,6 +82,16 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
         getAllWidgets(view);
         initSharedPreferences();
         startWithWaveSwitch.setChecked(startwithwave);
+        accModeSwitch.setChecked(accMode);
+        autoStartSwitch.setChecked(autoStart);
+        slowGainModeSwitch.setChecked(mSlowGainMode);
+        thrBar.setProgress(accelerationThresholdProg);
+        updateIntervalBar.setProgress(mUpdateIntervalProg);
+        speedBarOne.setProgress(mSpeedSetOne);
+        speedBarTwo.setProgress(mSpeedSetTwo);
+        volBarOne.setProgress(mVolSetOne);
+        volBarTwo.setProgress(mVolSetTwo);
+
         return view;
     }
 
@@ -107,6 +118,7 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
         volBarTwo = (SeekBar) view.findViewById(R.id.seekVolThrTwo);
         volTextTwo = (TextView) view.findViewById(R.id.textVolThrTwo);
         slowGainModeSwitch = (Switch) view.findViewById(R.id.switchSlowGainMode);
+        autoStartSwitch = (Switch) view.findViewById(R.id.autoStartSwitch);
         updateIntervalBar = (SeekBar) view.findViewById(R.id.seekUpdateInterval);
         updateIntervalText = (TextView) view.findViewById(R.id.textUpdateInterval);
         speedBarOne.setOnSeekBarChangeListener(this);
@@ -116,21 +128,14 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
         updateIntervalBar.setOnSeekBarChangeListener(this);
         thrBar.setOnSeekBarChangeListener(this);
         slowGainModeSwitch.setOnCheckedChangeListener(this);
-        slowGainModeSwitch.setChecked(mSlowGainMode);
         accModeSwitch.setOnCheckedChangeListener(this);
-        accModeSwitch.setChecked(accMode);
         startWithWaveSwitch.setOnCheckedChangeListener(this);
-
+        autoStartSwitch.setOnCheckedChangeListener(this);
 
         speedBarOne.setMax(100);
         speedBarTwo.setMax(100);
 
-        thrBar.setProgress(accelerationThresholdProg);
-        updateIntervalBar.setProgress(mUpdateIntervalProg);
-        speedBarOne.setProgress(mSpeedSetOne);
-        speedBarTwo.setProgress(mSpeedSetTwo);
-        volBarOne.setProgress(mVolSetOne);
-        volBarTwo.setProgress(mVolSetTwo);
+
     }
 
     private void initSharedPreferences(){
@@ -158,6 +163,7 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
 
         profile_prefs = getActivity().getSharedPreferences(KEY_PROFILE_PREFS+active_profile_number,0);
 
+        autoStart = mode_prefs.getBoolean(translucentLauncher.AUTO_START,false);
         startwithwave = mode_prefs.getBoolean(translucentLauncher.START_WITH_WAVE,false);
         loadProfilePreferences();
     }
@@ -260,7 +266,6 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
             mUpdateInterval = mUpdateIntervalProg*1000;
         }
         updateUI();
-        saveProfilePreferences();
 
 
     }
@@ -271,6 +276,7 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
     }
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+        saveProfilePreferences();
 
     }
     @Override
@@ -288,20 +294,22 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
                     mode_prefs.edit().putBoolean(translucentLauncher.START_WITH_WAVE,isChecked).apply();
                 }
                 break;
+            case R.id.autoStartSwitch :
+                if(mode_prefs!=null){
+                    mode_prefs.edit().putBoolean(translucentLauncher.AUTO_START,isChecked).apply();
+                }
         }
         saveProfilePreferences();
     }
     @Override
     public void onPause() {
         super.onPause();
+        mode_prefs.unregisterOnSharedPreferenceChangeListener(mode_changed_listener);
     }
 
     @Override
     public void onDestroy() {
-        if(mode_changed_listener!=null){
-            mode_prefs.unregisterOnSharedPreferenceChangeListener(mode_changed_listener);
 
-        }
         super.onDestroy();
     }
 

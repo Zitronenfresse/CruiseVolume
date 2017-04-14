@@ -15,8 +15,8 @@ android {
         applicationId "com.procrastech.cruisevolume"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 14
-        versionName "1.8 SquareshapedMeatballs"
+        versionCode 19
+        versionName "1.1 Beta - Kandiertes Schnitzel"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -48,6 +48,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:10.2.1'
     testCompile 'junit:junit:4.12'
 }
+
 
 
 

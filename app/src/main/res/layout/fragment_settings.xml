@@ -98,6 +98,43 @@
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/customborder"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textUpdateInterval"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+
+            <SeekBar
+                android:id="@+id/seekUpdateInterval"
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="15"
+                android:progress="1"
+                android:thumb="@mipmap/ic_launcher_round" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+
+            <TextView
+                android:id="@+id/updateInfoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="@string/updateIntervalInfoText" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/customborder"
             android:orientation="vertical">
@@ -117,20 +154,17 @@
                 android:progress="2"
                 android:thumb="@mipmap/ic_launcher_round" />
 
-            <TextView
-                android:id="@+id/textUpdateInterval"
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center" />
+                android:layout_height="10dp" />
 
-            <SeekBar
-                android:id="@+id/seekUpdateInterval"
-                style="@style/Widget.AppCompat.SeekBar.Discrete"
+            <TextView
+                android:id="@+id/thresholdInfoText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="15"
-                android:progress="1"
-                android:thumb="@mipmap/ic_launcher_round" />
+                android:textAlignment="center"
+                android:text="@string/thresholdInfoText" />
+
 
         </LinearLayout>
 
@@ -161,6 +195,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/startwithwave_text" />
+
+            <Switch
+                android:id="@+id/autoStartSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/autoStartSwitchText" />
         </LinearLayout>
 
         <TextView
@@ -168,6 +208,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.61"
+            android:textAlignment="center"
             android:text="@string/disclaimerText"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="0dp" />

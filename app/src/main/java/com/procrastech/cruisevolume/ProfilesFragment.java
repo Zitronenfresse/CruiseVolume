@@ -23,7 +23,7 @@ import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_PROFILE;
 public class ProfilesFragment extends Fragment {
 
     SharedPreferences mode_prefs;
-    private int active_profile_number;
+    private static int active_profile_number;
 
     AlertDialog renameDialog;
 
@@ -105,12 +105,18 @@ public class ProfilesFragment extends Fragment {
     }
 
     @Override
+    public void onPause(){
+        super.onPause();
+        profileGroup.setOnCheckedChangeListener(null);
+        profileGroup.setOnLongClickListener(null);
+    }
+
+    @Override
     public void onDestroy(){
         super.onDestroy();
         if(renameDialog!=null){
             renameDialog.dismiss();
         }
-        //profileGroup.setOnCheckedChangeListener(null);
 
     }
 
@@ -129,8 +135,8 @@ public class ProfilesFragment extends Fragment {
     }
 
     private void setActive_profile_number(int active_profile_number){
-        if(this.active_profile_number!=active_profile_number){
-            this.active_profile_number = active_profile_number;
+        if(ProfilesFragment.active_profile_number !=active_profile_number){
+            ProfilesFragment.active_profile_number = active_profile_number;
             SharedPreferences.Editor editor = mode_prefs.edit();
             editor.putInt(KEY_ACTIVE_PROFILE_NUMBER,active_profile_number);
             editor.apply();

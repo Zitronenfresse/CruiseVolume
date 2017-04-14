@@ -1,9 +1,12 @@
 package com.procrastech.cruisevolume;
 
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -24,6 +27,8 @@ import com.procrastech.cruisevolume.util.IabHelper;
 import com.procrastech.cruisevolume.util.IabResult;
 import com.procrastech.cruisevolume.util.Inventory;
 import com.procrastech.cruisevolume.util.Purchase;
+
+import static com.procrastech.cruisevolume.CruiseService.REQUEST_CHECK_SETTINGS;
 
 
 public class tabSettingsActivity extends AppCompatActivity {
@@ -64,9 +69,44 @@ public class tabSettingsActivity extends AppCompatActivity {
         }
     };
 
+
+
+    @Override
+    protected void onNewIntent(Intent intent){
+        PendingIntent pI = (getIntent().getParcelableExtra("resolution"));
+
+        if(pI!=null){
+            Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(it);
+
+            try {
+                startIntentSenderForResult(pI.getIntentSender(),1,null,0,0,0);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PendingIntent pI = (getIntent().getParcelableExtra("resolution"));
+
+        if(pI!=null){
+
+
+            Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(it);
+
+            try {
+                startIntentSenderForResult(pI.getIntentSender(),1,null,0,0,0);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        }
+
+
 
         Intent intent = new Intent(this, CruiseService.class);
         startService(intent);
@@ -141,6 +181,8 @@ public class tabSettingsActivity extends AppCompatActivity {
         }
     };
 
+
+
     public void consumeItem() {
         mHelper.queryInventoryAsync(mReceivedInventoryListener);
     }
@@ -192,14 +234,29 @@ public class tabSettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode,
-                                    Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+
         if (!mHelper.handleActivityResult(requestCode,
                 resultCode, data)) {
+            switch (requestCode) {
+                // Check for the integer request code originally supplied to startResolutionForResult().
+                case REQUEST_CHECK_SETTINGS:
+                    switch (resultCode) {
+                        case Activity.RESULT_OK:
+                            Log.i("LSR", "User agreed to make required location settings changes.");
+                            break;
+                        case Activity.RESULT_CANCELED:
+                            Log.i("LSR", "User chose not to make required location settings changes.");
+                            break;
+                    }
+                    break;
+            }
             super.onActivityResult(requestCode, resultCode, data);
         }
+
     }
+
 
     public void onSendFeebackButton(View view){
 
@@ -260,15 +317,18 @@ public class tabSettingsActivity extends AppCompatActivity {
 
     @Override
     public void onPause(){
+        super.onPause();
         if (mAdView != null) {
             mAdView.pause();
         }
-        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        startService(new Intent(this,CruiseService.class));
         if (mAdView != null) {
             mAdView.resume();
         }
@@ -281,10 +341,9 @@ public class tabSettingsActivity extends AppCompatActivity {
         }
         super.onDestroy();
         if (mHelper != null){
-            mHelper.dispose();
+             mHelper.dispose();
         }
         mHelper = null;
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 
     }
 

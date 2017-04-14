@@ -5,7 +5,7 @@
     <string name="accmode_switch_text">Beschleunigungssensor benutzen</string>
     <string name="action_settings">Einstellungen</string>
     <string name="buy_pro">Pro Version kaufen (entfernt Werbung)</string>
-    <string name="disclaimerText">Haftungsausschluss: Diese Anwendung reguliert die Lautstärke ihrer Musik. Verwenden sie die Anwendung gemäß lokaler Gesetze und fahren sie sicher.</string>
+    <string name="disclaimerText">Fahre sicher! Benutze dein Gehirn! Genieß die Fahrt!</string>
     <string name="enter_your_feedback_here_text">Geben sie Verbesserungsvorschläge und Kritik hier ein</string>
     <string name="feedback_title_text">Ihre Meinung ist uns wichtig!</string>
     <string name="final_speed">Erreichen der finalen Lautstärke ab %1$d km/h</string>
@@ -45,4 +45,7 @@
     <string name="disclaimer_text">Haftungsausschluß</string>
     <string name="privacyPolicyText">Datenschutzerklärung</string>
     <string name="startwithwave_text">Animation bei Anwendungsstart</string>
+    <string name="thresholdInfoText">"Ab einem Update Interval über 5 Sekunden kann der Beschleunigungssensor in ihrem Gerät (falls aktiviert) temporäre Standort Updates erfragen um die Genauigkeit kurzzeitig zu verbessern. Eine niedrige Sensitivität führt dazu dass der Sensor bei niedrigeren Beschleunigungen ausgelöst wird. "</string>
+    <string name="updateIntervalInfoText">Falls sie eine andere App (z.B. Navigationssoftware) nutzen die Standortabfragen tätigt, wird Cruise Volume diese Daten verwenden um den Akkuverbrauch zu minimieren.</string>
+    <string name="autoStartSwitchText">Aktiv bei App-Start</string>
 </resources>

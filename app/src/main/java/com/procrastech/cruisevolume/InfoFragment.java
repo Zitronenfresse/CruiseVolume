@@ -50,7 +50,7 @@ public class InfoFragment extends Fragment {
         privacyPolicyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uri = Uri.parse("http://www.cruisevolume.procrastech.de/privacypolicy.html");
+                Uri uri = Uri.parse("http://www.procrastech.de/privacypolicy.html");
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
@@ -59,7 +59,7 @@ public class InfoFragment extends Fragment {
         disclaimerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uri = Uri.parse("http://www.cruisevolume.procrastech.de/disclaimer.html");
+                Uri uri = Uri.parse("http://www.procrastech.de/disclaimer.html");
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
