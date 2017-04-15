@@ -131,12 +131,13 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public int onStartCommand(Intent intent,int flags,int startId){
         Log.d("myIntent","Onstartcommand called");
         super.onStartCommand(intent,flags,startId);
+        initSharedPreferences();
+        LocationProviderHelper.setUpdateInterval(mUpdateInterval);
+
         if(intent!=null){
             handleIntent(intent);
         }
         startForeground(1,buildForegroundNotification());
-        initSharedPreferences();
-        LocationProviderHelper.setUpdateInterval(mUpdateInterval);
 
         return START_REDELIVER_INTENT;
     }

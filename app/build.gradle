@@ -15,8 +15,8 @@ android {
         applicationId "com.procrastech.cruisevolume"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 19
-        versionName "1.1 Beta - Kandiertes Schnitzel"
+        versionCode 21
+        versionName "1.1 Kandiertes Schnitzel mit Bluetooth"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

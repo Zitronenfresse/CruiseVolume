@@ -28,7 +28,7 @@
     <string name="profile_two_text">Profil Zwei</string>
     <string name="profiles_renameDialogNegativeButton_text">Abbrechen</string>
     <string name="profiles_renameDialogPositiveButton_text">Umbenennen</string>
-    <string name="profiles_renameDialog_text">Umbenennen von</string>
+    <string name="profiles_renameDialog_text">"Umbenennen von "</string>
     <string name="rotatinglogo_content_description">rotierendes Logo</string>
     <string name="send_feedback_button_text">Feedback absenden</string>
     <string name="sendfeedback_chooser_text">Feedback absenden</string>
@@ -48,4 +48,6 @@
     <string name="thresholdInfoText">"Ab einem Update Interval über 5 Sekunden kann der Beschleunigungssensor in ihrem Gerät (falls aktiviert) temporäre Standort Updates erfragen um die Genauigkeit kurzzeitig zu verbessern. Eine niedrige Sensitivität führt dazu dass der Sensor bei niedrigeren Beschleunigungen ausgelöst wird. "</string>
     <string name="updateIntervalInfoText">Falls sie eine andere App (z.B. Navigationssoftware) nutzen die Standortabfragen tätigt, wird Cruise Volume diese Daten verwenden um den Akkuverbrauch zu minimieren.</string>
     <string name="autoStartSwitchText">Aktiv bei App-Start</string>
+    <string name="btDevice_launching_Info_text">Aktives Autostart-BT-Profil. Lange drücken um es zu entfernen.</string>
+    <string name="btdevicespaired_info_text">BT aktivieren für Gekoppelte Bt-Geräte. Lange drücken um als AutoStart-Profil festzulegen.</string>
 </resources>

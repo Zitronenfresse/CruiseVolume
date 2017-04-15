@@ -1,5 +1,7 @@
 package com.procrastech.cruisevolume;
 
+import android.*;
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -9,6 +11,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -54,6 +58,10 @@ public class translucentLauncher extends AppCompatActivity {
             // Hide the status bar.
             int ui = View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(ui);
+
+            final Window win= getWindow();
+            win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
             setContentView(R.layout.translucentlauncherminimal_layout);
             final ImageView v = (ImageView) findViewById(R.id.wave);
 
@@ -190,8 +198,8 @@ public class translucentLauncher extends AppCompatActivity {
     }
 
     protected boolean checkForPermissions() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(translucentLauncher.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_LOCATION);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(translucentLauncher.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH}, MY_PERMISSIONS_REQUEST_ACCESS_LOCATION);
             return false;
         } else {
             Log.d("MY", "Permissions already granted");

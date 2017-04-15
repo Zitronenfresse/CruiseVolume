@@ -32,7 +32,7 @@
     <string name="tabSettings_infoTab_text">Info</string>
     <string name="sendfeedback_chooser_text">Send Feedback</string>
     <string name="sendfeedback_noClientInstalledToast_text">There is no email client installed.</string>
-    <string name="profiles_renameDialog_text">Rename</string>
+    <string name="profiles_renameDialog_text">"Rename "</string>
     <string name="profiles_renameDialogPositiveButton_text">Rename</string>
     <string name="profiles_renameDialogNegativeButton_text">Cancel</string>
     <string name="profile_one_text">Profile One</string>
@@ -48,5 +48,7 @@
     <string name="thresholdInfoText">With Update Intervals higher than 5 seconds the Acceleration Sensor can trigger temporary Location Updates to improve Accuracy. Low Sensitivity means that the Sensor triggers at slower Acceleration.</string>
     <string name="updateIntervalInfoText">If you are using another App (e.g. Navigation software)requesting Location Updates, Cruise Volume will use this Data to minimize Power Consumption.</string>
     <string name="autoStartSwitchText">Active on App-launch</string>
+    <string name="btDevice_launching_Info_text">BT-Device that launches Cruise Volume. Long Click to Remove AutoStart on Connection from Device.</string>
+    <string name="btdevicespaired_info_text">Enable Bt to see Paired BT-Devices. Long Click on Device to assign AutoStart on Connection to Device</string>
 
 </resources>

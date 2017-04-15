@@ -2,6 +2,8 @@ package com.procrastech.cruisevolume;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +19,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
@@ -27,6 +34,10 @@ import com.procrastech.cruisevolume.util.IabHelper;
 import com.procrastech.cruisevolume.util.IabResult;
 import com.procrastech.cruisevolume.util.Inventory;
 import com.procrastech.cruisevolume.util.Purchase;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static com.procrastech.cruisevolume.CruiseService.REQUEST_CHECK_SETTINGS;
 
@@ -39,6 +50,10 @@ public class tabSettingsActivity extends AppCompatActivity {
     private InfoFragment mInfoFragment;
     private ViewPager viewPager;
     private TabLayout allTabs;
+
+
+
+
 
     protected static boolean proVersion;
 
@@ -114,6 +129,8 @@ public class tabSettingsActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,new IntentFilter(ACTION_STOP_SETTINGS));
 
 
+
+
         SharedPreferences settings = getSharedPreferences(KEY_MODE_PREFS, 0);
 
         proVersion = !settings.getBoolean(KEY_PREF_PURCHASE_PROVERSION_AVAILABLE,true);
@@ -128,14 +145,15 @@ public class tabSettingsActivity extends AppCompatActivity {
         }
 
 
+        //registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+
+
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-
-
         allTabs = (TabLayout) findViewById(R.id.tabs);
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mSettingsFragment = new SettingsFragment();
-        mProfilesFragment = new ProfilesFragment();
-        mInfoFragment = new InfoFragment();
+        if(adapter==null)adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        if(mSettingsFragment==null)mSettingsFragment = new SettingsFragment();
+        if(mProfilesFragment==null)mProfilesFragment = new ProfilesFragment();
+        if(mInfoFragment==null)mInfoFragment = new InfoFragment();
         adapter.addFragment(mSettingsFragment, getString(R.string.tabSettings_settingsTab_text));
         adapter.addFragment(mProfilesFragment, getString(R.string.tabSetting_profilesTab_text));
         adapter.addFragment(mInfoFragment, getString(R.string.tabSettings_infoTab_text));
@@ -205,7 +223,7 @@ public class tabSettingsActivity extends AppCompatActivity {
                 }
                 Log.d("IAB","InventoryQueryfinsihed, user has pro: " + hasPurchased_PROVERSION);
                 editor.putBoolean(KEY_PREF_PURCHASE_PROVERSION_AVAILABLE, !hasPurchased_PROVERSION);
-                editor.commit();
+                editor.apply();
 
                 if(toRecreate){
                     recreate();
@@ -335,7 +353,14 @@ public class tabSettingsActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onStop(){
+        super.onStop();
+
+    }
+
+    @Override
     public void onDestroy() {
+
         if (mAdView != null) {
             mAdView.destroy();
         }
@@ -346,5 +371,22 @@ public class tabSettingsActivity extends AppCompatActivity {
         mHelper = null;
 
     }
+
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive (Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+
+                //mProfilesFragment.updateBluetooth();
+            }
+
+        }
+
+    };
+
+
+
 
 }

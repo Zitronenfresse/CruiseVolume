@@ -43,6 +43,7 @@ public class LocationProviderHelper implements GoogleApiClient.ConnectionCallbac
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
         mLocationSettingsRequest = builder.build();
+        mConnectedToAPI = false;
     }
 
     public void checkLocationSettings() {
@@ -108,7 +109,7 @@ public class LocationProviderHelper implements GoogleApiClient.ConnectionCallbac
 
     private void createGoogleAPIClient() {
         if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(context)
+            mGoogleApiClient = new GoogleApiClient.Builder(cruiseService.getApplicationContext())
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
