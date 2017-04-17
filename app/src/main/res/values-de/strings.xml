@@ -50,4 +50,12 @@
     <string name="autoStartSwitchText">Aktiv bei App-Start</string>
     <string name="btDevice_launching_Info_text">Aktives Autostart-BT-Profil. Lange drücken um es zu entfernen.</string>
     <string name="btdevicespaired_info_text">BT aktivieren für Gekoppelte Bt-Geräte. Lange drücken um als AutoStart-Profil festzulegen.</string>
+    <string name="customnot_pauseResumeButtonText">Pause/Fortsetzen</string>
+    <string name="customnot_settingsbuttonText">Einstellungen</string>
+    <string name="customnot_speedText">Geschwindigkeit  : %1$d km/h</string>
+    <string name="customnot_statusText">Status: %1$s</string>
+    <string name="customnot_stopButtonText">Stop</string>
+    <string name="customnot_volumeText">Lautstärke : %1$d</string>
+    <string name="status_active">Aktiv</string>
+    <string name="status_inactive">Inaktiv</string>
 </resources>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/StopButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:text="@string/customnot_stopButtonText"
+            android:layout_marginBottom="1dp"/>
+
+
+        <Button
+            android:id="@+id/PauseResumeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:layout_marginTop="1dp"
+            android:text="@string/customnot_pauseResumeButtonText" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="170dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/customnot_statustext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/customnot_statusText"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/customnot_speedtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/customnot_speedText"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/customnot_volumetext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/customnot_volumeText"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/SettingsButton"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:text="@string/customnot_settingsbuttonText" />
+
+</LinearLayout>

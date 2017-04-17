@@ -31,9 +31,10 @@ public class BluetoothLauncherHelper extends BroadcastReceiver {
             Log.d("BLUETOOTH","Bluetooth connect");
 
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            if(device.getAddress().equals(address)){
+            if(device.getName().equals(address)){
                 Log.d("BLUETOOTH","my Bluetooth device connect");
                 Intent i = new Intent(context,translucentLauncher.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
 
             }

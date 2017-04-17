@@ -47,7 +47,7 @@ public class ProfilesFragment extends Fragment {
     private ListView bluetoothListView;
 
     private Handler handler;
-    private int bluetoothUpdateDelay = 5000;
+    private int bluetoothUpdateDelay = 3000;
     AdapterView.OnItemLongClickListener btListener;
     View.OnLongClickListener btdeviceListener;
 
@@ -181,8 +181,8 @@ public class ProfilesFragment extends Fragment {
             ArrayList<String> oldBTSCAN = new ArrayList<String>(s);
             ArrayList<String> newBTSCAN = new ArrayList<String>();
             for(BluetoothDevice bt : pairedDevices){
-                Log.d("BLUETOOTH","Bluetooth device found " + bt.getAddress());
-                newBTSCAN.add(bt.getAddress());
+                Log.d("BLUETOOTH","Bluetooth device found " + bt.getName());
+                newBTSCAN.add(bt.getName());
 
             }
 
@@ -218,7 +218,8 @@ public class ProfilesFragment extends Fragment {
 
         s = new ArrayList<String>();
         for(BluetoothDevice bt : pairedDevices)
-            s.add(bt.getAddress());
+            s.add(bt.getName());
+
 
         if(arrayAdapter==null)arrayAdapter = new ArrayAdapter<String>(getActivity(),R.layout.list,s);
         if(bluetoothListView!=null){

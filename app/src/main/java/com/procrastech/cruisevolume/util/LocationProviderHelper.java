@@ -28,22 +28,20 @@ import com.procrastech.cruisevolume.tabSettingsActivity;
 
 public class LocationProviderHelper implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,ResultCallback<LocationSettingsResult>{
 
-    private static int updateInterval;
-    private static boolean mConnectedToAPI = false;
-    private static boolean startLocationUpdatesOnAPIConnected = false;
-    protected static boolean updating = false;
+    private int updateInterval;
+    private boolean mConnectedToAPI = false;
+    private boolean startLocationUpdatesOnAPIConnected = false;
 
-    private static CruiseService cruiseService;
-    private static Context context;
-    static LocationRequest mLocationRequest;
-    static GoogleApiClient mGoogleApiClient;
+    private CruiseService cruiseService;
+    private LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private final Context c;
     private  LocationSettingsRequest mLocationSettingsRequest;
 
-    protected void buildLocationSettingsRequest() {
+    private void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
         mLocationSettingsRequest = builder.build();
-        mConnectedToAPI = false;
     }
 
     public void checkLocationSettings() {
@@ -60,41 +58,43 @@ public class LocationProviderHelper implements GoogleApiClient.ConnectionCallbac
 
 
     public LocationProviderHelper(Context context, CruiseService cruiseService){
-        setContext(context);
-        LocationProviderHelper.cruiseService = cruiseService;
+
+        c = context;
+        this.cruiseService = cruiseService;
         createGoogleAPIClient();
-        mGoogleApiClient.connect();
+
     }
 
-    public static void setContext(Context context){
-        LocationProviderHelper.context = context;
-    }
 
-    public static void startLocationUpdates(){
-        if(!updating){
-            if(mConnectedToAPI){
+
+    public void startLocationUpdates(){
+        Log.d("TESTONE","start Locationupdates call from service");
+            if(mGoogleApiClient.isConnected()){
+                Log.d("TESTONE","is connected to API and requesting loc updates");
+
                 requestLocationUpdates();
             }else{
+                Log.d("TESTONE","is not connected to API and setting startOnApiConnected");
+
                 startLocationUpdatesOnAPIConnected = true;
             }
-        }
 
     }
 
 
 
-    public static void stopLocationUpdates(){
-        if(mConnectedToAPI){
+    public void stopLocationUpdates(){
+        if(mGoogleApiClient.isConnected()){
             removeLocationRequests();
         }
     }
 
-    public static void setUpdateInterval(int updateInterval){
+    public void setUpdateInterval(int updateInterval){
 
-        if(LocationProviderHelper.updateInterval!=updateInterval){
-            LocationProviderHelper.updateInterval = updateInterval;
+        if(this.updateInterval!=updateInterval){
+            this.updateInterval = updateInterval;
             createLocationRequest();
-            if(mConnectedToAPI&&CruiseService.updatingLocation){
+            if(mGoogleApiClient.isConnected()&&cruiseService.updatingLocation){
                 removeLocationRequests();
                 requestLocationUpdates();
             }
@@ -102,23 +102,26 @@ public class LocationProviderHelper implements GoogleApiClient.ConnectionCallbac
         }
     }
 
-    protected static void removeLocationRequests(){
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,cruiseService);
+    private void removeLocationRequests(){
+        if(mGoogleApiClient.isConnected()){
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,cruiseService);
+        }
 
     }
 
     private void createGoogleAPIClient() {
         if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(cruiseService.getApplicationContext())
+            mGoogleApiClient = new GoogleApiClient.Builder(c)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
             Log.d("MY", "GoogleAPIClient built");
         }
+        mGoogleApiClient.connect();
     }
 
-    private static void createLocationRequest() {
+    private void createLocationRequest() {
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(updateInterval);
@@ -128,11 +131,14 @@ public class LocationProviderHelper implements GoogleApiClient.ConnectionCallbac
 
     }
 
-    protected static void requestLocationUpdates(){
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+    private void requestLocationUpdates(){
+        if (ActivityCompat.checkSelfPermission(c, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
 
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,cruiseService);
+        Log.d("TESTONE","requesting Location updates for cruise service");
+        if(mGoogleApiClient.isConnected()){
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,cruiseService);
+        }
     }
 
 
@@ -140,23 +146,30 @@ public class LocationProviderHelper implements GoogleApiClient.ConnectionCallbac
     public void onConnected(Bundle connectionHint) {
         Log.d("MY", "Connected to API");
         mConnectedToAPI = true;
+        Log.d("TESTONE","is connected to API");
+
         if(startLocationUpdatesOnAPIConnected){
+            Log.d("TESTONE","is connected to API and requesting loc updates onConnected");
+
             requestLocationUpdates();
             startLocationUpdatesOnAPIConnected = false;
         }
     }
 
-    public static void disconnect(){
+    public void disconnect(){
         mGoogleApiClient.disconnect();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         mConnectedToAPI = false;
+        Log.d("TESTONE","is not connected to API anymore");
+
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d("TESTONE","is not connected to API , failed");
 
     }
 

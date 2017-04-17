@@ -27,6 +27,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.RemoteViews;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -47,6 +49,7 @@ import static com.procrastech.cruisevolume.tabSettingsActivity.KEY_PROFILE_PREFS
 
 public class CruiseService extends Service implements com.google.android.gms.location.LocationListener,SensorEventListener{
 
+    private static final int CUSTOM_NOTIFICATION_ID = 772;
     AudioManager mAudioManager;
     private double mSpeed;
     protected int mUpdateInterval;
@@ -60,7 +63,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     protected int goalVol;
     protected int curVol;
     NotificationManager mNotificationManager;
-    public static boolean updatingLocation = false;
+    public boolean updatingLocation = false;
     protected int[] boundarr;
     protected int[] volarr;
     protected boolean slowGainMode;
@@ -71,6 +74,11 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public static final String ACTION_START_UPDATES = "com.procrastech.cruisevolume.ACTION_START_UPDATES";
 
     protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+
+    private Notification mCustomNotification;
+    private RemoteViews contentView;
+    NotificationCompat.Builder mBuilder;
+
 
     LocationProviderHelper locationProviderHelper;
 
@@ -105,7 +113,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
             double a = Math.sqrt(x*x+y*y+z*z);
 
-            if(a>accelerationThreshold){
+            if(a>accelerationThreshold&&accMode){
                 Log.d("ACCELERATION","threshold triggered " + a);
                 requestQuickLocationUpdates();
             }
@@ -132,13 +140,14 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         Log.d("myIntent","Onstartcommand called");
         super.onStartCommand(intent,flags,startId);
         initSharedPreferences();
-        LocationProviderHelper.setUpdateInterval(mUpdateInterval);
+        locationProviderHelper.setUpdateInterval(mUpdateInterval);
 
         if(intent!=null){
             handleIntent(intent);
         }
-        startForeground(1,buildForegroundNotification());
+        startForeground(CUSTOM_NOTIFICATION_ID,buildCustomNotification());
 
+        updateNotification();
         return START_REDELIVER_INTENT;
     }
 
@@ -245,7 +254,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         if(mUpdateInterval!=updateInterval){
             mUpdateInterval = updateInterval;
             cachedUpdateInterval = -1;
-            LocationProviderHelper.setUpdateInterval(mUpdateInterval);
+            locationProviderHelper.setUpdateInterval(mUpdateInterval);
         }
         createBoundaries();
 
@@ -257,46 +266,45 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         senSensorManager.registerListener(this, senLinearAcceleration, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    private Notification buildForegroundNotification(){
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+    private Notification buildCustomNotification(){
+        mBuilder = new NotificationCompat.Builder(this);
 
         mBuilder.setContentTitle(getString(R.string.notification_title_shortappname_text));
         mBuilder.setSmallIcon(R.drawable.noticon);
         mBuilder.setOngoing(true);
-        if( Build.VERSION.SDK_INT < 23){
-            mBuilder.setColor(ContextCompat.getColor(getBaseContext(), R.color.color_not_background));
-        }else{
-            mBuilder.setColor(getResources().getColor(R.color.color_not_background,getTheme()));
-        }
+
+        contentView = new RemoteViews(getPackageName(),R.layout.notificationview_layout);
+
         Intent stopTargetIntent = new Intent(this, CruiseService.class);
         stopTargetIntent.setAction(ACTION_STOP_SERVICE);
         PendingIntent stopIntent = PendingIntent.getService(this, 0, stopTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Action stopaction = new NotificationCompat.Action.Builder(R.drawable.ic_not_stop, getString(R.string.notification_action_stop_text), stopIntent).build();
-        mBuilder.addAction(stopaction);
+        contentView.setOnClickPendingIntent(R.id.StopButton,stopIntent);
+
 
         Intent pauseTargetIntent = new Intent(this, CruiseService.class);
         String pauseResume;
         if(updatingLocation){
             pauseResume = getString(R.string.notification_action_pause_text);
             pauseTargetIntent.setAction(ACTION_STOP_UPDATES);
-            mBuilder.setContentText(getString(R.string.notification_content_is_running_text));
         }else{
             pauseTargetIntent.setAction(ACTION_START_UPDATES);
             pauseResume = getString(R.string.notification_action_resume_text);
-            mBuilder.setContentText(getString(R.string.notification_content_is_paused_text));
         }
+        contentView.setTextViewText(R.id.PauseResumeButton,pauseResume);
         PendingIntent pauseIntent = PendingIntent.getService(this, 0, pauseTargetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Action pauseaction = new NotificationCompat.Action.Builder(R.drawable.ic_not_pause, pauseResume, pauseIntent).build();
-        mBuilder.addAction(pauseaction);
+        contentView.setOnClickPendingIntent(R.id.PauseResumeButton,pauseIntent);
 
         Intent tabsettingsTargetIntent = new Intent(this, tabSettingsActivity.class);
         PendingIntent tabsettingsIntent = PendingIntent.getActivity(this, 0, tabsettingsTargetIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Action settingsaction = new NotificationCompat.Action.Builder(R.drawable.ic_not_settings, getString(R.string.notification_action_settings_text), tabsettingsIntent).build();
-        mBuilder.addAction(settingsaction);
+        contentView.setOnClickPendingIntent(R.id.SettingsButton,tabsettingsIntent);
 
+
+        mBuilder.setCustomContentView(contentView);
         mBuilder.setPriority(Notification.PRIORITY_MAX);
+
         return mBuilder.build();
     }
+
 
     private Runnable runnableVolAdjuster = new Runnable() {
         @Override
@@ -308,12 +316,29 @@ public class CruiseService extends Service implements com.google.android.gms.loc
         }
     };
 
+    private void updateNotification() {
+        String status;
+        if(updatingLocation){
+            status = getResources().getString(R.string.status_active);
+            contentView.setTextViewText(R.id.customnot_speedtext,getResources().getString(R.string.customnot_speedText, ((int) mSpeed)));
+            contentView.setTextViewText(R.id.customnot_volumetext,getResources().getString(R.string.customnot_volumeText,curVol));
+        }else{
+            status = getResources().getString(R.string.status_inactive);
+            contentView.setTextViewText(R.id.customnot_speedtext,"");
+            contentView.setTextViewText(R.id.customnot_volumetext,"");
+        }
+        contentView.setTextViewText(R.id.customnot_statustext,getResources().getString(R.string.customnot_statusText,status));
+
+
+        mNotificationManager.notify(CUSTOM_NOTIFICATION_ID,mBuilder.build());
+    }
+
     protected void startLocationUpdates() {
         curVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         goalVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         locationProviderHelper.checkLocationSettings();
         handler.postDelayed(runnableVolAdjuster, mVolumeUpdateDelay);
-        LocationProviderHelper.startLocationUpdates();
+        locationProviderHelper.startLocationUpdates();
         Log.d("LOCATION", "Starting Location updates");
         updatingLocation = true;
         if(boundarr==null||volarr==null){
@@ -324,9 +349,10 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     protected void stopLocationUpdates(){
 
-        LocationProviderHelper.stopLocationUpdates();
+        locationProviderHelper.stopLocationUpdates();
         handler.removeCallbacks(runnableVolAdjuster);
         updatingLocation = false;
+
         Log.d("LOCATION", "Stopping Location updates");
 
     }
@@ -334,6 +360,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     @Override
     public void onLocationChanged(Location location) {
         Log.d("PREF",active_profile_number+" active profile number");
+        updateNotification();
 
         if(cachedUpdateInterval!=-1){
             if(quickUpdateCounter > 0){
@@ -341,7 +368,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
             }else{
                 mUpdateInterval = cachedUpdateInterval;
                 cachedUpdateInterval = -1;
-                LocationProviderHelper.setUpdateInterval(mUpdateInterval);
+                locationProviderHelper.setUpdateInterval(mUpdateInterval);
             }
         }
         mLastLocation = location;
@@ -350,7 +377,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     public void volumeControl(int speed){
         if(boundarr!=null&&volarr!=null){
-            //Log.d("CONTROL", "VOL CONTROL Cycle with speed "+speed+" :");
             curVol = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 
             if(speed>=boundarr[0]){
@@ -368,7 +394,7 @@ public class CruiseService extends Service implements com.google.android.gms.loc
 
     @Override public void onDestroy(){
         cancelNotifications();
-        LocationProviderHelper.disconnect();
+        locationProviderHelper.disconnect();
         mode_prefs.unregisterOnSharedPreferenceChangeListener(mode_changed_listener);
         profile_prefs.unregisterOnSharedPreferenceChangeListener(profile_changed_listener);
         super.onDestroy();
@@ -389,9 +415,6 @@ public class CruiseService extends Service implements com.google.android.gms.loc
                 curVol--;
             }
         }
-
-
-
     }
 
     private void updateVolume() {
@@ -440,9 +463,5 @@ public class CruiseService extends Service implements com.google.android.gms.loc
     public void cancelNotifications(){
         mNotificationManager.cancelAll();
     }
-
-
-
-
 
 }
